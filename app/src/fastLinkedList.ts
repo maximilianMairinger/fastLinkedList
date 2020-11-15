@@ -73,7 +73,6 @@ export class LinkedList<T> implements Iterable<T> {
   *[Symbol.iterator](): Iterator<T, any, unknown> {
     if (this.head) {
       let cur = this.head
-      yield cur.val
       while(cur.next.next !== cur) {
         cur = cur.next
         yield cur.val
