@@ -1,4 +1,4 @@
-import fastLinkedList from "./../../app/src/fastLinkedList"
+import LinkedList from "./../../app/src/fastLinkedList"
 //const testElem = document.querySelector("#test")
 
-fastLinkedList()
+console.log(new LinkedList)
