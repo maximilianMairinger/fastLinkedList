@@ -17,16 +17,18 @@
     "url": "git+https://github.com/maximilianMairinger/fastLinkedList.git"
   },
   "keywords": [
-  "fast",
-  "linked",
-  "list",
-  "single",
-  "singly",
-  "o(1)",
-  "remove",
-  "es6",
-  "es2015"
-],
+    "fast",
+    "linked",
+    "list",
+    "single",
+    "singly",
+    "o(1)",
+    "remove",
+    "es6",
+    "es2015",
+    "typescript",
+    "ts"
+  ],
   "author": "Maximilian Mairinger",
   "license": "ISC",
   "bugs": {
