@@ -1,0 +1,47 @@
+{
+  "name": "fast-linked-list",
+  "version": "0.0.1",
+  "description": "Blazing fast singly linked list.",
+  "main": "app/dist/fastLinkedList.js",
+  "types": "app/dist/fastLinkedList.d.ts",
+  "scripts": {
+    "build": "tsc -p ./tsconfig.prod.json",
+    "dev": "npm run devWeb",
+    "devWeb": "rollup --config rollup.web.dev.config.js -w",
+    "devNode": "rollup --config rollup.node.dev.config.js -w",
+    "deploy": "npm run build && npm publish",
+    "test": "node ./repl/dist/fastLinkedList-repl.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maximilianMairinger/fastLinkedList.git"
+  },
+  "keywords": [
+  "fast",
+  "linked",
+  "list",
+  "single",
+  "singly",
+  "o(1)",
+  "remove",
+  "es6",
+  "es2015"
+],
+  "author": "Maximilian Mairinger",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/maximilianMairinger/fastLinkedList/issues"
+  },
+  "homepage": "https://github.com/maximilianMairinger/fastLinkedList#readme",
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^13.0.0",
+    "@rollup/plugin-json": "^4.1.0",
+    "@rollup/plugin-node-resolve": "^8.1.0",
+    "@rollup/plugin-typescript": "^5.0.0",
+    "@types/node": "^13.13.4",
+    "rollup": "^2.18.1",
+    "tslib": "2.0.0",
+    "typescript": "^4.0.2",
+    "webpack-merge": "^5.0.9"
+  }
+}
