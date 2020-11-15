@@ -4,10 +4,12 @@ class Link<T> {
   }
 
   remove() {
-    const next = this.next
-    this.next = undefined
-    this.val = next.val
-    this.next = next.next
+    this.val = this.next.val
+    this.next = this.next.next
+  }
+
+  protected removeLast() {
+    this.next.next = undefined
   }
 
   valueof() {
@@ -16,7 +18,7 @@ class Link<T> {
 }
 
 
-
+ 
 
 
 export class LinkedList<T> implements Iterable<T> {
@@ -37,15 +39,20 @@ export class LinkedList<T> implements Iterable<T> {
   bulkAdd(items: T[] | LinkedList<T> = []) {
     let preCur: Link<T>
     let cur: Link<T> = this.tail
+    delete cur.remove
     for (let item of items) {
       preCur = cur
       cur.next = cur = new Link(item)
     }
     this.tail = cur
+    cur.remove = (cur as any).removeLast
     cur.next = preCur
   }
   add(val: T) {
-    this.tail.next = new Link(val, this.tail)
+    delete this.tail.remove
+    this.tail = this.tail.next = new Link(val, this.tail)
+    this.tail.remove = (this.tail as any).removeLast
+    return this.tail
   }
 
   first() {
