@@ -21,16 +21,11 @@ class Link<T> {
 
 export class LinkedList<T> implements Iterable<T> {
   private head: Link<T>
+  private tail: Link<T>
   constructor(items: T[] | LinkedList<T> = []) {
-    const preHead = {} as {next?: any}
-    let preCur: Link<T>
-    let cur: Link<T> = preHead as any
-    for (let item of items) {
-      preCur = cur
-      cur.next = cur = new Link(item)
-    }
+    const preHead = this.tail = {} as any
+    this.bulkAdd(items)
     this.head = preHead.next
-    cur.next = preCur
   }
   
   each(cb: (el: T) => void) {
@@ -39,17 +34,30 @@ export class LinkedList<T> implements Iterable<T> {
     }
   }
 
-  protected get [0]() {
-    return this.head
+  bulkAdd(items: T[] | LinkedList<T> = []) {
+    let preCur: Link<T>
+    let cur: Link<T> = this.tail
+    for (let item of items) {
+      preCur = cur
+      cur.next = cur = new Link(item)
+    }
+    this.tail = cur
+    cur.next = preCur
   }
+  add(val: T) {
+    this.tail.next = new Link(val, this.tail)
+  }
+
   first() {
     return this.head.val
+  }
+  last() {
+    return this.tail.val
   }
 
   length() {
     let count = 0
     for (const e of this) {
-      console.log(e)
       count++
     }
     return count
@@ -71,7 +79,6 @@ export class LinkedList<T> implements Iterable<T> {
 
 
 
-console.log("qwe")
 //@ts-ignore
 let e = window.e = new LinkedList([2, 3, 4, 5])
 console.log(e)
