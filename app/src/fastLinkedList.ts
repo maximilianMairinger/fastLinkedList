@@ -25,7 +25,7 @@ class Entry<T> {
 
 
 
-
+const d = e => e.toString()
 export class LinkedList<T = unknown> implements Iterable<T> {
   private head: Link<T>
   private tail: Link<T>
@@ -39,12 +39,19 @@ export class LinkedList<T = unknown> implements Iterable<T> {
     this.head = preHead.next
   }
 
-  toString() {
+  toString(methodForEntries: (s: T) => string = d) {
     let s = "["
-    debugger
     for (let e of this) {
-      console.log(e)
-      s += e.toString() + ", "
+      s += "\""
+      let q = methodForEntries(e)
+      let ind = q.indexOf("\"")
+      while(ind !== -1) {
+        s += q.substring(0, ind) + "\\"
+        q = q.substring(ind + 1, q.length)
+        ind = q.indexOf("\"")
+      }
+      
+      s += q + "\", "
     }
     return s.substring(0, s.length-2) + "]"
   }
