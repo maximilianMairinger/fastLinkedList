@@ -47,6 +47,7 @@ export class LinkedList<T = unknown> implements Iterable<T> {
       cb(el, i)
       i++
     }
+    return this
   }
 
   _bulkAdd(item: LinkedList<T>): void
@@ -84,16 +85,38 @@ export class LinkedList<T = unknown> implements Iterable<T> {
     for (let f of this) {
       (f as any)(...params)
     }
+    return this
   }
   clear() {
     this.tail = this.head = undefined
     this._length = 0
+    return this
   }
   hardClear() {
     this.length = 0
+    return this
+  }
+  set empty(to: boolean) {
+    if (to) this.length = 0
+  }
+  get empty() {
+    return this._length === 0
   }
   pop() {
-
+    const t = this.tail
+    const val = t.value
+    this._length--
+    this.tail = t.prev
+    t.value = t.prev = t.prev.next = undefined
+    return val
+  }
+  shift() {
+    const h = this.head
+    const val = h.value
+    this._length--
+    this.head = h.next
+    h.value = h.next = h.next.prev = undefined
+    return val
   }
   add(val: T): Entry<T> {
     return new Entry(new LinkedList(this._add(val)), this)
@@ -120,12 +143,14 @@ export class LinkedList<T = unknown> implements Iterable<T> {
       } 
       cb(cur.value, i)
     }
+    return this
   }
   reverse() {
     const n = new LinkedList()
     for (let e of this) {
       n._dda(e)
     }
+    return n
   }
 
   set first(to: T) {
