@@ -29,16 +29,25 @@ class Entry<T> {
 export class LinkedList<T = unknown> implements Iterable<T> {
   private head: Link<T>
   private tail: Link<T>
-  private _length: number
+  private _length: number = 0
   
   constructor(item: LinkedList<T>)
   constructor(item?: T, ...items: T[])
   constructor(item: LinkedList<T> | T, ...items: T[]) {
     const preHead = this.tail = {} as any
-    this._bulkAdd(arguments as any)
+    (this as any)._bulkAdd(...arguments)
     this.head = preHead.next
   }
 
+  toString() {
+    let s = "["
+    debugger
+    for (let e of this) {
+      console.log(e)
+      s += e.toString() + ", "
+    }
+    return s.substring(0, s.length-2) + "]"
+  }
   
   each(cb: (el: T, i: number) => void) {
     let i = 0
@@ -56,7 +65,7 @@ export class LinkedList<T = unknown> implements Iterable<T> {
     let cur: Link<T> = this.tail
 
     for (let item of itms) {
-      cur.next = cur = new Link(item, cur)
+      cur.next = cur = new Link(item, undefined)
     }
 
     this._length += itms.length
@@ -212,6 +221,7 @@ export class LinkedList<T = unknown> implements Iterable<T> {
         yield cur.value
         cur = cur.next
       } 
+      yield cur.value
       return cur.value
     }
   }
@@ -220,10 +230,5 @@ export class LinkedList<T = unknown> implements Iterable<T> {
 
 
 LinkedList.prototype.iterator = LinkedList.prototype[Symbol.iterator]
-
-
-//@ts-ignore
-let e = window.e = new LinkedList([2])
-console.log(e)
 
 export default LinkedList
