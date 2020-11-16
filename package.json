@@ -1,7 +1,7 @@
 {
   "name": "fast-linked-list",
   "version": "0.0.1",
-  "description": "Blazing fast singly linked list.",
+  "description": "Blazing fast doubly linked list.",
   "main": "app/dist/fastLinkedList.js",
   "types": "app/dist/fastLinkedList.d.ts",
   "scripts": {
@@ -20,8 +20,8 @@
     "fast",
     "linked",
     "list",
-    "single",
-    "singly",
+    "double",
+    "doubly",
     "o(1)",
     "remove",
     "es6",
