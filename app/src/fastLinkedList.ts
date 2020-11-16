@@ -1,4 +1,4 @@
-import { createBrotliCompress } from "zlib"
+
 
 class Link<T> {
   constructor(public value: T, public prev?: Link<T>, public next?: Link<T>) {
@@ -7,16 +7,16 @@ class Link<T> {
 }
 
 class Entry<T> {
-  constructor(public readonly links: LinkedList<Link<T>>, protected readonly master: LinkedList<T>) {
+  constructor(public readonly links: LinkedList<Link<T>>, public readonly master: LinkedList<T>) {
 
   }
-  move() {
-    return this
-  }
-
-
 
   remove() {
+    if (this.links.last.next) this.links.last.next.prev = this.links.first.prev
+    if (this.links.first.prev) this.links.first.prev.next = this.links.last.next
+
+    //@ts-ignore
+    this.master._length++
     return this
   }
 
@@ -90,10 +90,6 @@ export class LinkedList<T = unknown> implements Iterable<T> {
   clear() {
     this.tail = this.head = undefined
     this._length = 0
-    return this
-  }
-  hardClear() {
-    this.length = 0
     return this
   }
   set empty(to: boolean) {
@@ -178,7 +174,8 @@ export class LinkedList<T = unknown> implements Iterable<T> {
 
     this.eachLink((link) => {
       if (i >= to) {
-        link.prev = link.next = link.value = undefined
+        link.prev = link.prev.next = undefined
+        return true
       }
       i++
     })
@@ -196,11 +193,11 @@ export class LinkedList<T = unknown> implements Iterable<T> {
     return n as any
   }
 
-  private eachLink(cb: (link: Link<T>) => void) {
+  private eachLink(cb: (link: Link<T>) => boolean | void) {
     if (this.head) {
       let cur = this.head
       while (cur.next) {
-        cb(cur)
+        if (cb(cur)) return
         cur = cur.next
       } 
       cb(cur)
