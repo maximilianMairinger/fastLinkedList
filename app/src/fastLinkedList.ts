@@ -39,7 +39,6 @@ export class LinkedList<T = unknown> implements Iterable<T> {
     this.head = preHead.next
   }
 
-  values?(): Iterator<T, T, unknown>;
   
   each(cb: (el: T, i: number) => void) {
     let i = 0
@@ -216,10 +215,11 @@ export class LinkedList<T = unknown> implements Iterable<T> {
       return cur.value
     }
   }
+  iterator?(): Iterator<T, T, unknown>;
 }
 
 
-LinkedList.prototype.values = LinkedList.prototype[Symbol.iterator]
+LinkedList.prototype.iterator = LinkedList.prototype[Symbol.iterator]
 
 
 //@ts-ignore
