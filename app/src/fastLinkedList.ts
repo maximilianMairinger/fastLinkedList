@@ -63,7 +63,7 @@ function proxy<Ob extends {[key in string]: any}, F extends keyof Ob>(ob: Ob, fu
 }
 
 
-const d = e => e.toString()
+const toStringDefault = e => e.toString()
 export class LinkedList<T = unknown> implements Iterable<T> {
   private head: Link<T>
   private tail: Link<T>
@@ -136,19 +136,10 @@ export class LinkedList<T = unknown> implements Iterable<T> {
     (this as any)._addBulk(...arguments)
   }
 
-  toString(methodForEntries: (s: T) => string = d) {
+  toString(methodForEntries: (s: T) => string = toStringDefault) {
     let s = "["
     for (let e of this) {
-      s += "\""
-      let q = methodForEntries(e)
-      let ind = q.indexOf("\"")
-      while(ind !== -1) {
-        s += q.substring(0, ind) + "\\"
-        q = q.substring(ind + 1, q.length)
-        ind = q.indexOf("\"")
-      }
-      
-      s += q + "\", "
+      s += methodForEntries(e) + ", "
     }
     return s.substring(0, s.length-2) + "]"
   }
