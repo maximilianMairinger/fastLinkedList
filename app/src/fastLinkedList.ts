@@ -86,9 +86,10 @@ export class LinkedList<T = unknown> implements Iterable<T> {
           this.tail = preOb
         }
         const postProxy = () => {
-          this.head = preOb.next
-          this.head.setPrev = this.removeFirstOverride
-          remove()
+          if (this.head = preOb.next) {
+            this.head.setPrev = this.removeFirstOverride
+            remove()
+          }
         }
         return proxy(this, ["_addBulk", "addBulk", "_add"], preProxy, postProxy)
       })();
@@ -98,9 +99,10 @@ export class LinkedList<T = unknown> implements Iterable<T> {
           this.head = preOb
         }
         const postProxy = () => {
-          this.tail = preOb.prev
-          this.tail.setNext = this.removeLastOverride
-          remove()
+          if (this.tail = preOb.prev) {
+            this.tail.setNext = this.removeLastOverride
+            remove()
+          }
         }
         return proxy(this, ["_dda"], preProxy, postProxy)
       })();
@@ -131,7 +133,6 @@ export class LinkedList<T = unknown> implements Iterable<T> {
         this.removeFirstOverride = firstPPP
       }
     }
-
     isEmptyProxy();
     (this as any)._addBulk(...arguments)
   }

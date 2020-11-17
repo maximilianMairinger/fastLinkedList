@@ -22,6 +22,7 @@ describe("Core", () => {
       new LinkedList(ls)
     })
 
+
     describe("toString", () => {
       test('Plain', () => {
         let s = ls.toString()
