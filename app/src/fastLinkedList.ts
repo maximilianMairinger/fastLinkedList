@@ -4,25 +4,63 @@ class Link<T> {
   constructor(public value: T, public prev?: Link<T>, public next?: Link<T>) {
 
   }
+  setPrev(l: Link<T>) {
+    this.prev.next = l
+  }
+  setNext(l: Link<T>) {
+    this.next.prev = l
+  }
+
+  // lastify(onSetNext: (l: Link<T>) => void) {
+  //   this.setNext = onSetNext
+  // }
+  // deLastify() {
+  //   delete this.setNext
+  // }
+  // firstify(onSetPrev: (l: Link<T>) => void) {
+  //   this.setPrev = onSetPrev
+  // }
+  // deFirstify() {
+  //   delete this.setPrev
+  // }
 }
 
 class Entry<T> {
-  constructor(public readonly links: LinkedList<Link<T>>, public readonly master: LinkedList<T>) {
+  constructor(private readonly links: LinkedList<Link<T>>, private readonly master: LinkedList<T>) {
 
   }
 
   remove() {
-    if (this.links.last.next) this.links.last.next.prev = this.links.first.prev
-    if (this.links.first.prev) this.links.first.prev.next = this.links.last.next
+    const first = this.links.first
+    const last = this.links.last;
 
-    //@ts-ignore
-    this.master._length++
+    (this.master as any)._length -= this.links.length 
+    
+    first.setPrev(last.next);
+    last.setNext(first.prev);
+    
+
+    
     return this
   }
 
 }
 
-
+function proxy<Ob extends {[key in string]: any}, F extends keyof Ob>(ob: Ob, funcProps: F[], preProxy: Function, postProxy: Function) {
+  for (let prop of funcProps) {
+    const base = ob[prop].bind(ob)
+    ob[prop] = ((...a) => {
+      preProxy(...a)
+      base(...a)
+      postProxy(...a)
+    }) as any
+  }
+  return function remove() {
+    for (let prop of funcProps) {
+      delete ob[prop]
+    }
+  }
+}
 
 
 const d = e => e.toString()
@@ -30,13 +68,72 @@ export class LinkedList<T = unknown> implements Iterable<T> {
   private head: Link<T>
   private tail: Link<T>
   private _length: number = 0
+  private removeLastOverride: (e: Link<T>) => void;
+  private removeFirstOverride: (e: Link<T>) => void;
   
   constructor(item: LinkedList<T>)
   constructor(item?: T, ...items: T[])
   constructor(item: LinkedList<T> | T, ...items: T[]) {
-    const preHead = this.tail = {} as any
-    (this as any)._bulkAdd(...arguments)
-    this.head = preHead.next
+    const removeLastOverride = this.removeLastOverride = (e: Link<T>) => {
+      this.tail = e
+      e.setNext = this.removeLastOverride
+    }
+
+    const isEmptyProxy = () => {
+      const preOb: any = {};
+      const removeAdd = (() => {
+        const preProxy = () => {
+          this.tail = preOb
+        }
+        const postProxy = () => {
+          this.head = preOb.next
+          this.head.setPrev = this.removeFirstOverride
+          remove()
+        }
+        return proxy(this, ["_addBulk", "addBulk", "_add"], preProxy, postProxy)
+      })();
+      
+      const removeDda = (() => {
+        const preProxy = () => {
+          this.head = preOb
+        }
+        const postProxy = () => {
+          this.tail = preOb.prev
+          this.tail.setNext = this.removeLastOverride
+          remove()
+        }
+        return proxy(this, ["_dda"], preProxy, postProxy)
+      })();
+
+      const remove = () => {
+        removeAdd()
+        removeDda()
+      }
+    }
+
+    const removeFirstOverride = this.removeFirstOverride = (e: Link<T>) => {
+      this.head = e
+      e.setPrev = this.removeFirstOverride
+    }
+    
+    const firstPPP = this.removeFirstOverride = (e: Link<T>) => {
+      if (this.empty) isEmptyProxy()
+      else {
+        (this.removeFirstOverride = removeFirstOverride)(e)
+        this.removeLastOverride = lastPPP
+      }
+    }
+
+    const lastPPP = (e: Link<T>) => {
+      if (this.empty) isEmptyProxy();
+      else {
+        (this.removeLastOverride = removeLastOverride)(e)
+        this.removeFirstOverride = firstPPP
+      }
+    }
+
+    isEmptyProxy();
+    (this as any)._addBulk(...arguments)
   }
 
   toString(methodForEntries: (s: T) => string = d) {
@@ -65,33 +162,39 @@ export class LinkedList<T = unknown> implements Iterable<T> {
     return this
   }
 
-  _bulkAdd(item: LinkedList<T>): void
-  _bulkAdd(item: T, ...items: T[]): void
-  _bulkAdd(item: LinkedList<T> | T, ...items: T[]): void {
+  from
+
+  _addBulk(item: LinkedList<T>): void
+  _addBulk(item: T, ...items: T[]): void
+  _addBulk(item: LinkedList<T> | T, ...items: T[]): void {
     const itms = item instanceof LinkedList ? item : arguments
     let cur: Link<T> = this.tail
+    delete cur.setNext
 
     for (let item of itms) {
-      cur.next = cur = new Link(item, undefined)
+      cur.next = cur = new Link(item, cur)
     }
 
     this._length += itms.length
-
+    cur.setNext = this.removeLastOverride
     this.tail = cur
   }
 
-  bulkAdd(item: LinkedList<T>): Entry<T>
-  bulkAdd(item: T, ...items: T[]): Entry<T>
-  bulkAdd(item: LinkedList<T> | T, ...items: T[]): Entry<T> {
+  addBulk(item: LinkedList<T>): Entry<T>
+  addBulk(item: T, ...items: T[]): Entry<T>
+  addBulk(item: LinkedList<T> | T, ...items: T[]): Entry<T> {
     const links: LinkedList<Link<T>> = new LinkedList
     const itms = item instanceof LinkedList ? item : arguments
 
     let cur: Link<T> = this.tail
+    delete cur.setNext
 
     for (let item of itms) {
       links.add(cur.next = cur = new Link(item, cur))
     }
     this.tail = cur
+    cur.setNext = this.removeLastOverride
+
     this._length += itms.length
 
     return new Entry(links, this)
@@ -115,33 +218,35 @@ export class LinkedList<T = unknown> implements Iterable<T> {
   }
   pop() {
     const t = this.tail
-    const val = t.value
     this._length--
-    this.tail = t.prev
-    t.value = t.prev = t.prev.next = undefined
-    return val
+    t.setNext(t.prev)
+    return t.value
   }
   shift() {
     const h = this.head
-    const val = h.value
     this._length--
-    this.head = h.next
-    h.value = h.next = h.next.prev = undefined
-    return val
+    h.setPrev(h.next)
+    return h.value
   }
   add(val: T): Entry<T> {
     return new Entry(new LinkedList(this._add(val)), this)
   }
   _add(val: T): Link<T> {
     this._length++
-    return this.tail = this.tail.next = new Link(val, this.tail)
+    delete this.tail.setNext
+    this.tail = this.tail.next = new Link(val, this.tail)
+    this.tail.setNext = this.removeLastOverride
+    return this.tail
   }
   dda(val: T): Entry<T> {
     return new Entry(new LinkedList(this._dda(val)), this)
   }
   _dda(val: T): Link<T> {
     this._length++
-    return this.head = this.head.prev = new Link(val, undefined, this.head)
+    delete this.tail.setPrev
+    this.head = this.head.prev = new Link(val, undefined, this.head)
+    this.head.setPrev = this.removeFirstOverride
+    return this.head
   }
   eachRev(cb: (value: T, index: number) => void) {
     if (this.tail) {
