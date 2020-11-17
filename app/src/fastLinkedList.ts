@@ -142,7 +142,7 @@ export class LinkedList<T = unknown> implements Iterable<T> {
     for (let e of this) {
       s += methodForEntries(e) + ", "
     }
-    return s.substring(0, s.length-2) + "]"
+    return s.slice(0, -2) + "]"
   }
   
   each(cb: (el: T, i: number) => void) {
@@ -153,8 +153,6 @@ export class LinkedList<T = unknown> implements Iterable<T> {
     }
     return this
   }
-
-  from
 
   _addBulk(item: LinkedList<T>): void
   _addBulk(item: T, ...items: T[]): void
