@@ -1,6 +1,6 @@
 # Fast linked list
 
-Blazing fast singly linked list.
+Blazing fast doubly linked list.
 
 > Please note that Fast linked list is currently under development and not yet suited for production
 
