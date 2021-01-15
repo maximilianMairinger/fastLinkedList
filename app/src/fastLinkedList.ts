@@ -91,7 +91,7 @@ export class LinkedList<T = unknown> implements Iterable<T> {
             remove()
           }
         }
-        return proxy(this, ["_addBulk", "addBulk", "_add"], preProxy, postProxy)
+        return proxy(this, ["_addBulk", "addBulk", "_add"] as any, preProxy, postProxy)
       })();
       
       const removeDda = (() => {
@@ -104,7 +104,7 @@ export class LinkedList<T = unknown> implements Iterable<T> {
             remove()
           }
         }
-        return proxy(this, ["_dda"], preProxy, postProxy)
+        return proxy(this, ["_dda"] as any, preProxy, postProxy)
       })();
 
       const remove = () => {
@@ -154,9 +154,9 @@ export class LinkedList<T = unknown> implements Iterable<T> {
     return this
   }
 
-  _addBulk(item: LinkedList<T>): void
-  _addBulk(item: T, ...items: T[]): void
-  _addBulk(item: LinkedList<T> | T, ...items: T[]): void {
+  protected _addBulk(item: LinkedList<T>): void
+  protected _addBulk(item: T, ...items: T[]): void
+  protected _addBulk(item: LinkedList<T> | T, ...items: T[]): void {
     const itms = item instanceof LinkedList ? item : arguments
     let cur: Link<T> = this.tail
     delete cur.setNext
@@ -221,7 +221,7 @@ export class LinkedList<T = unknown> implements Iterable<T> {
   add(val: T): Entry<T> {
     return new Entry(new LinkedList(this._add(val)), this)
   }
-  _add(val: T): Link<T> {
+  protected _add(val: T): Link<T> {
     this._length++
     delete this.tail.setNext
     this.tail = this.tail.next = new Link(val, this.tail)
@@ -231,7 +231,7 @@ export class LinkedList<T = unknown> implements Iterable<T> {
   dda(val: T): Entry<T> {
     return new Entry(new LinkedList(this._dda(val)), this)
   }
-  _dda(val: T): Link<T> {
+  protected _dda(val: T): Link<T> {
     this._length++
     delete this.tail.setPrev
     this.head = this.head.prev = new Link(val, undefined, this.head)
