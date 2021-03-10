@@ -2,19 +2,19 @@
   "name": "fast-linked-list",
   "version": "1.0.2",
   "description": "Blazing fast doubly linked list.",
-  "main": "./app/dist/esm/fastLinkedList.js",
+  "main": "./app/dist/esm/fastLinkedList.mjs",
   "types": "./app/dist/esm/fastLinkedList.d.ts",
   "exports": {
     "node": {
-      "import": "./app/dist/esm/fastLinkedList.js",
+      "import": "./app/dist/esm/fastLinkedList.mjs",
       "require": "./app/dist/cjs/fastLinkedList.js"
     },
-    "default": "./app/dist/esm/fastLinkedList.js"
+    "default": "./app/dist/esm/fastLinkedList.mjs"
   },
   "scripts": {
     "build": "npm run buildCJS && npm run buildESM",
-    "buildCJS": "tsc -p ./tsconfig.prod.cjs.json",
-    "buildESM": "tsc -p ./tsconfig.prod.esm.json",
+    "buildCJS": "del-cli app/dist/cjs && tsc -p ./tsconfig.prod.cjs.json",
+    "buildESM": "del-cli app/dist/esm && tsc -p ./tsconfig.prod.esm.json && renamer --find /\\.js$/i --replace .mjs app/dist/esm/**",
     "dev": "npm run devNode",
     "devWeb": "rollup --config rollup.web.dev.config.js -w",
     "devNode": "rollup --config rollup.node.dev.config.js -w",
@@ -54,8 +54,10 @@
     "@rollup/plugin-typescript": "^5.0.0",
     "@types/jest": "^26.0.15",
     "@types/node": "^13.13.4",
+    "del-cli": "^3.0.1",
     "jest": "^26.6.3",
     "jest-expect-ordered": "^1.0.0",
+    "renamer": "^2.0.1",
     "rollup": "^2.18.1",
     "tslib": "2.0.0",
     "typescript": "^4.0.2",
