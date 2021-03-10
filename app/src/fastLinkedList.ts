@@ -191,7 +191,7 @@ export class LinkedList<T = unknown> implements Iterable<T> {
   }
   call(...params: Parameters<T extends (...a: any) => void ? T : never>) {
     for (let f of this) {
-      (f as any)(...params)
+      (f as any)(...params as any)
     }
     return this
   }
