@@ -2,11 +2,20 @@
   "name": "fast-linked-list",
   "version": "1.0.1",
   "description": "Blazing fast doubly linked list.",
-  "main": "app/dist/fastLinkedList.js",
-  "types": "app/dist/fastLinkedList.d.ts",
+  "main": "./app/dist/esm/fastLinkedList.js",
+  "types": "./app/dist/esm/fastLinkedList.d.ts",
+  "exports": {
+    "node": {
+      "import": "./app/dist/esm/fastLinkedList.js",
+      "require": "./app/dist/cjs/fastLinkedList.js"
+    },
+    "default": "./app/dist/esm/fastLinkedList.js"
+  },
   "scripts": {
-    "build": "tsc -p ./tsconfig.prod.json",
-    "dev": "npm run devWeb",
+    "build": "npm run buildCJS && npm run buildESM",
+    "buildCJS": "tsc -p ./tsconfig.prod.cjs.json",
+    "buildESM": "tsc -p ./tsconfig.prod.esm.json",
+    "dev": "npm run devNode",
     "devWeb": "rollup --config rollup.web.dev.config.js -w",
     "devNode": "rollup --config rollup.node.dev.config.js -w",
     "deploy": "npm run build && npm publish",
