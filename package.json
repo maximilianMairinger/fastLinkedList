@@ -65,5 +65,8 @@
     "typescript": "^4.0.2",
     "webpack-merge": "^5.0.9",
     "yallist": "^4.0.0"
+  },
+  "dependencies": {
+    "highlvl-benchmark": "^1.0.0"
   }
 }
