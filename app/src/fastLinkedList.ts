@@ -8,10 +8,10 @@ export class LinkedList<T> {
     }
   }
   push(value: T | Token<T>) {
-    const token = value instanceof Token ? (() => {
-      value.remove()
-      return value
-    })() : new Token(value)
+    const valIsToken = value instanceof Token
+    const token = valIsToken ? value : new Token(value)
+    if (valIsToken) token.remove()
+
 
     this.length++
     
@@ -20,11 +20,13 @@ export class LinkedList<T> {
       token.prev = tail
       if (tail.prev) tail.prev.next = token
     }
+    else this.head = token
     return this.tail = token
   }
   pop() {
     if (this.tail) {
       this.length--
+      if (!this.length) delete this.head
       const curTail = this.tail
       delete curTail.prev.next
       this.tail = curTail.prev
@@ -33,10 +35,9 @@ export class LinkedList<T> {
     }
   }
   unshift(value: T | Token<T>) {
-    const token = value instanceof Token ? (() => {
-      value.remove()
-      return value
-    })() : new Token(value)
+    const valIsToken = value instanceof Token
+    const token = valIsToken ? value : new Token(value)
+    if (valIsToken) token.remove()
 
     this.length++
 
@@ -45,16 +46,33 @@ export class LinkedList<T> {
       token.next = head
       if (head.next) head.next.prev = token
     }
+    else this.tail = token
     return this.head = token
   }
   shift() {
     if (this.head) {
       this.length--
+      if (!this.length) delete this.tail
       const curHead = this.head
       delete curHead.next.prev
       this.head = curHead.next
       delete curHead.next
       return curHead.value
+    }
+  }
+  forEach(cb: (value: T) => void) {
+    for (const e of this) {
+      cb(e)
+    }
+  }
+  forEachReverse(cb: (value: T) => void) {
+    if (this.tail) {
+      let cur = this.tail
+      while (cur.prev) {
+        cb(cur.value)
+        cur = cur.prev
+      } 
+      cb(cur.value)
     }
   }
   *[Symbol.iterator](): Iterator<T, T, any> {
