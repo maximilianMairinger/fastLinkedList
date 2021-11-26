@@ -1,3 +1,5 @@
+const toStringDefault = e => e.toString()
+
 export class LinkedList<T> {
   public tail?: Token<T>
   public head?: Token<T>
@@ -93,6 +95,14 @@ export class LinkedList<T> {
     return this.tail.value
   }
   iterator?(): Iterator<T, T, unknown>;
+
+  toString(methodForEntries: (s: T) => string = toStringDefault) {
+    let s = "["
+    for (let e of this) {
+      s += methodForEntries(e) + ", "
+    }
+    return s.slice(0, -2) + "]"
+  }
 }
 
 export default LinkedList

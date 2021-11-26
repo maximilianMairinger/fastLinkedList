@@ -11,7 +11,7 @@ class Token<T> extends Item {
   constructor(public value: T){super()}
 }
 
-const benchmark = benchmarkSuite(10000000);
+const benchmark = benchmarkSuite(5000000);
 
 (async () => {
   await delay(1000)
