@@ -1,24 +1,48 @@
 const toStringDefault = e => e.toString()
 
+class End {}
+
+class Head<T> extends End {
+  public next?: Token<T> | Tail<T>
+}
+class Tail<T> extends End {
+  public prev?: Token<T> | Head<T>
+}
+
 class _LinkedList<T> {
-  public tail?: Token<T>
-  public head?: Token<T>
-  public length = 0
+  private tail?: Tail<T> = new Tail()
+  private head?: Head<T> = new Head()
+  private reversed = false
 
   constructor(ls: LinkedList<T>, reverse: boolean)
   constructor(...initValues: T[])
   constructor(...initValues: any[]) {
+    this.head.next = this.tail;
+    this.tail.prev = this.head;
+
     //@ts-ignore
     (this as any as LinkedList<T>).pushBulk(...(initValues[0] instanceof LinkedList ? [initValues[0], initValues[1]] : [initValues]))
   }
 
 
+  reverse(): boolean {
+    if (this.reversed = !this.reversed) {
+      attachFuncs(this, forwInv, revsInv)
+    }
+    else {
+      attachFuncs(this, forw, revs)
+    }
 
-  get first() {
-    return this.head.value
+    return this.reversed
   }
-  get last() {
-    return this.tail.value
+
+
+  toArray() {
+    const a = []
+    for (const e of this as any as LinkedList<T>) {
+      a.push(e)
+    }
+    return a
   }
 
   toString(methodForEntries: (s: T) => string = toStringDefault) {
@@ -35,7 +59,7 @@ const mkItr = (values: any[] | LinkedList<any>, reverse: boolean) => {
     if (values instanceof Array) {
       return (function*() {
         let i = values.length-1
-        for (; i > 0; i--) {
+        for (; i >= 0; i--) {
           yield values[i]
         }
 
@@ -47,7 +71,7 @@ const mkItr = (values: any[] | LinkedList<any>, reverse: boolean) => {
   else return values[Symbol.iterator]()
 }
 
-const pushOrUnshift = (push: boolean) => {
+const pushOrUnshift = (push: boolean, realDir: boolean = push) => {
   const headKey = push ? "head" : "tail"
   const tailKey = push ? "tail" : "head"
   const nextKey = push ? "next" : "prev"
@@ -55,76 +79,86 @@ const pushOrUnshift = (push: boolean) => {
 
   function add(value: any) {
     const token = new Token(value)
-    this.length = this.length + (push ? 1 : -1)
     
-    const end = this[tailKey]
-    if (end) {
+    const tailElem = this[tailKey]
+    const end = tailElem[prevKey]
+    if (!(end instanceof End)) {
       token[prevKey] = end
+      token[nextKey] = tailElem
       end[nextKey] = token
     }
-    else this[headKey] = token
-    return this[tailKey] = token
+    else {
+      const headElem = this[headKey]
+      headElem[nextKey] = token
+      end[prevKey] = headElem
+    }
+    return tailElem[prevKey] = token
   }
 
   
-
-  function addBulk (values: any[] | LinkedList<any>, reverse: boolean = false) {
+  const reverseDefault = !realDir
+  function addBulk (values: any[] | LinkedList<any>, reverse = false) {
     const ret = new (values.constructor as any) as Token<any>[] | LinkedList<Token<any>>
-    if (values.length < 2) {
-      if (values.length === 1) ret.push(this.push(values[Symbol.iterator]().next().value))
-      return ret
-    }
-
-    this.length = this.length + (push ? values.length : -values.length)
-    let end = this[headKey]
-
-    const itr = mkItr(values, reverse)
+    const rev = reverse ? !reverseDefault : reverseDefault
+    const itr = mkItr(values, rev)
     let result = itr.next()
+    if (result.done) return ret
+    const tailElem = this[tailKey]
+    let end = tailElem[prevKey]
+    
     const token = new Token(result.value)
     ret.push(token)
     
-    if (end) {
+    if (!(end instanceof End)) {
       token[prevKey] = end
       end[nextKey] = token
+      end = token
     }
-    else end = this[headKey] = token
+    else {
+      const headElem = this[headKey]
+      end = headElem[nextKey] = token
+      end[prevKey] = headElem
+    }
     
     result = itr.next()
-    do {
+    const pushKey = rev ? "unshift" : "push"
+    while(!result.done) {
       const token = new Token(result.value)
+      ret[pushKey](token)
       token[prevKey] = end
       end[nextKey] = token
       end = token
       result = itr.next()
-    } while(!result.done)
+    }
     
-    this[tailKey] = end
+    tailElem[prevKey] = end
+    end[nextKey] = tailElem
     return ret
   }
 
   function pop() {
-    if (this[tailKey]) {
-      this.length = this.length + (push ? -1 : 1)
-      if (!this.length) delete this[headKey]
-      const curTail = this[tailKey]
-      delete curTail[prevKey][nextKey]
-      this[tailKey] = curTail[prevKey]
-      delete curTail[prevKey]
-      return curTail.value
-    }
+    const tailElem = this[tailKey]
+    const curTailTok = tailElem[prevKey]
+    tailElem[prevKey] = curTailTok[prevKey]
+    curTailTok[prevKey][nextKey] = tailElem
+    return curTailTok.value
   }
 
   function* itr() {
-    if (this[headKey]) {
-      let cur = this[headKey]
-      while (cur[nextKey]) {
-        yield cur.value
-        cur = cur[nextKey]
-      } 
+    let cur = this[headKey]
+    let curNext = cur[nextKey]
+    while (curNext[nextKey]) {
+      cur = curNext
+      curNext = curNext[nextKey]
       yield cur.value
-      return cur.value
-    }
+    } 
+    return cur.value
   }
+
+  function first() {
+    return this[headKey][nextKey].value
+  }
+
 
 
 
@@ -132,24 +166,39 @@ const pushOrUnshift = (push: boolean) => {
     add,
     addBulk,
     pop,
-    itr
+    itr,
+    first
   }
 }
 
+
+
+function attachFuncs(pr: any, forw: ReturnType<typeof pushOrUnshift>, revs: ReturnType<typeof pushOrUnshift>) {
+  pr.push = forw.add
+  pr.pushBulk = forw.addBulk
+  pr.unshift = revs.add
+  pr.unshiftBulk = revs.addBulk
+  pr.pop = forw.pop
+  pr.shift = revs.pop
+  pr.iterator = pr[Symbol.iterator] = forw.itr
+  pr.iteratorReverse = revs.itr
+  pr.forEach = itrToEachFunc("iterator")
+  pr.forEachReverse = itrToEachFunc("iteratorReverse")
+  Object.defineProperty(pr, "first", {get: forw.first, configurable: true})
+  Object.defineProperty(pr, "last", {get: revs.first, configurable: true})
+}
+
 const forw = pushOrUnshift(true)
+const revsInv = pushOrUnshift(true, false)
 const revs = pushOrUnshift(false)
+const forwInv = pushOrUnshift(false, true)
 
-const pr = _LinkedList.prototype as any
-pr.push = forw.add
-pr.pushBulk = forw.addBulk
-pr.unshift = revs.add
-pr.unshiftBulk = revs.addBulk
-pr.pop = forw.pop
-pr.shift = revs.pop
-pr.iterator = pr[Symbol.iterator] = forw.itr
-pr.iteratorReverse = revs.itr
+attachFuncs(_LinkedList.prototype, forw, revs)
+const prototypeKeys = Object.keys(_LinkedList.prototype)
 
-const itrToEachFunc = (itrKey: "iterator" | "iteratorReverse") => {
+
+
+function itrToEachFunc(itrKey: "iterator" | "iteratorReverse") {
   return function each(cb: Function) {
     const itr = this[itrKey]()
     let result = itr.next();
@@ -160,8 +209,6 @@ const itrToEachFunc = (itrKey: "iterator" | "iteratorReverse") => {
   }
 }
 
-pr.forEach = itrToEachFunc("iterator")
-pr.forEachReverse = itrToEachFunc("iteratorReverse")
 
 
 export type LinkedList<T> = _LinkedList<T> & {
@@ -175,7 +222,9 @@ export type LinkedList<T> = _LinkedList<T> & {
   unshiftBulk: ((values: T[], reverseValues?: boolean) => Token<T>[]) & ((values: LinkedList<T>, reverse?: boolean) => LinkedList<Token<T>>),
   iterator: () => Iterator<T, T, unknown>,
   iteratorReverse: () => Iterator<T, T, unknown>,
-  [Symbol.iterator]: (() => Iterator<T, T, unknown>)
+  [Symbol.iterator]: () => Iterator<T, T, unknown>,
+  first: Readonly<T>,
+  last: Readonly<T>
 }
 export const LinkedList = _LinkedList as {
   new<T>(ls: LinkedList<T>): LinkedList<T>
@@ -199,16 +248,18 @@ export class Token<T> {
   }
   remove() {
     let suc = false
+    const next = this.next
+    const prev = this.prev
     if (this.next) {
       //@ts-ignore
-      this.next.prev = this.prev
-      delete this.next
+      next.prev = prev
+      this.next = undefined
       suc = true
     }
     if (this.prev) {
       //@ts-ignore
-      this.prev.next = this.next
-      delete this.prev
+      prev.next = next
+      this.prev = undefined
       suc = true
     }
     return suc

@@ -7,9 +7,53 @@ import delay from "delay"
 import timoi from "timoi"
 import {List, Item} from "linked-list"
 
-class Token<T> extends Item {
-  constructor(public value: T){super()}
-}
+
+
+
+const ls = new LinkedList("a", "b", "c", "d")
+ls.reverse()
+const e = ls.pushBulk(["7", "8", "9"], true)
+ls.reverse()
+
+ls.reverse()
+
+e[1].remove()
+
+ls.reverse()
+
+e[0].remove()
+
+ls.reverse()
+
+
+
+
+console.log(ls.toArray(), ls.first, ls.last)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// class Token<T> extends Item {
+//   constructor(public value: T){super()}
+// }
 
 // const benchmark = benchmarkSuite(10);
 
@@ -67,56 +111,56 @@ class Token<T> extends Item {
 // })()
 
 
-const benchmark = benchmarkSuite(1000000);
+// const benchmark = benchmarkSuite(1000000);
 
 
-const toBeAdded = []
-for (let i = 0; i < 1000000; i++) {
-  toBeAdded.push(i)
-}
+// const toBeAdded = []
+// for (let i = 0; i < 1000000; i++) {
+//   toBeAdded.push(i)
+// }
 
-benchmark(
-  function linkedList() {
-    const ls = new LinkedList()
-    let tok2 = ls.push("www")
-    ls.pushBulk(toBeAdded)
-    let tok1 = ls.push("lol")
-    ls.pushBulk(toBeAdded)
-    ls.pushBulk(toBeAdded)
+// benchmark(
+//   function linkedList() {
+//     const ls = new LinkedList()
+//     let tok2 = ls.push("www")
+//     ls.pushBulk(toBeAdded)
+//     let tok1 = ls.push("lol")
+//     ls.pushBulk(toBeAdded)
+//     ls.pushBulk(toBeAdded)
     
-    return () => {
-      tok1.remove()
-      tok1 = ls.unshift(22)
-      tok2.remove()
-      tok2 = ls.push(33)
-    }
-  },
-  function nativeArray() {
-    const ls = []
-    let tok2 = ls.length
-    ls.push("www")
-    for (let e of toBeAdded) {
-      ls.push(e)
-    }
-    let tok1 = ls.length
-    ls.push("lol")
-    for (let e of toBeAdded) {
-      ls.push(e)
-    }
-    for (let e of toBeAdded) {
-      ls.push(e)
-    }
-    return () => {
-      ls.splice(tok1, 1)
-      ls.unshift(22)
-      tok1 = 0
-      ls.splice(tok2, 1)
-      tok2 = ls.length
-      ls.push(33)
-    }
-  }
+//     return () => {
+//       tok1.remove()
+//       tok1 = ls.unshift(22)
+//       tok2.remove()
+//       tok2 = ls.push(33)
+//     }
+//   },
+//   function nativeArray() {
+//     const ls = []
+//     let tok2 = ls.length
+//     ls.push("www")
+//     for (let e of toBeAdded) {
+//       ls.push(e)
+//     }
+//     let tok1 = ls.length
+//     ls.push("lol")
+//     for (let e of toBeAdded) {
+//       ls.push(e)
+//     }
+//     for (let e of toBeAdded) {
+//       ls.push(e)
+//     }
+//     return () => {
+//       ls.splice(tok1, 1)
+//       ls.unshift(22)
+//       tok1 = 0
+//       ls.splice(tok2, 1)
+//       tok2 = ls.length
+//       ls.push(33)
+//     }
+//   }
 
-)
+// )
 
 
 // const ls = new LinkedList<string>("a", "b", "c")
