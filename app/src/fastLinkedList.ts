@@ -17,11 +17,15 @@ class _LinkedList<T> {
   constructor(ls: LinkedList<T>, reverse: boolean)
   constructor(...initValues: T[])
   constructor(...initValues: any[]) {
-    this.head.next = this.tail;
-    this.tail.prev = this.head;
+    this.clear();
 
     //@ts-ignore
     (this as any as LinkedList<T>).pushBulk(...(initValues[0] instanceof LinkedList ? [initValues[0], initValues[1]] : [initValues]))
+  }
+
+  clear() {
+    this.head.next = this.tail;
+    this.tail.prev = this.head;
   }
 
 

@@ -10,22 +10,41 @@ import {List, Item} from "linked-list"
 
 
 
-const ls = new LinkedList("a", "b", "c", "d")
-ls.reverse()
-const e = ls.pushBulk(["7", "8", "9"], true)
-ls.reverse()
+const ls = new LinkedList("b", "c")
+const dElem = ls.push("a")
+console.log(ls.toArray()) // ["b", "c", "a"]
+
+console.log(dElem.remove()) // true (meaning successfully removed)
+console.log(dElem.remove()) // false
+
+const dElem2 = ls.unshift(dElem.value)
+
+for (const elem of ls) {
+  console.log(elem) // "a", "b", "c"
+}
 
 ls.reverse()
 
-e[1].remove()
+const addedElems = ls.pushBulk(["x", "y", "z"])
+console.log(ls.toArray()) // ["c", "b", "a", "x", "y", "z"]
 
-ls.reverse()
+addedElems[1].remove()
+console.log(ls.toArray()) // ["c", "b", "a", "x", "z"]
 
-e[0].remove()
+ls.pop() // "z"
+ls.shift() // "c"
+ls.first // "b"
+ls.last // "x"
 
-ls.reverse()
+console.log(ls.toArray())
+ls.forEachReverse((e) => {
+  console.log(e) // "x", "a", "b"
+})
 
+const clone = new LinkedList(ls)
+ls.clear()
 
+console.log(clone.toArray())
 
 
 console.log(ls.toArray(), ls.first, ls.last)
