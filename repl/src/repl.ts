@@ -1,4 +1,4 @@
-import {LinkedList} from "./../../app/src/fastLinkedList"
+import {LinkedList, Token} from "./../../app/src/fastLinkedList"
 //const testElem = document.querySelector("#test")
 // import yallist from "yallist"
 import * as yallist from "yallist"
@@ -9,45 +9,55 @@ import {List, Item} from "linked-list"
 
 
 
+const ls = new LinkedList("a", "b", "c", "d")
 
-const ls = new LinkedList("b", "c")
-const dElem = ls.push("a")
-console.log(ls.toArray()) // ["b", "c", "a"]
+console.log(new LinkedList("7", "8", "9").map(x => new Token(x)))
+ls.unshiftBulk(new LinkedList("7", "8", "9"))
 
-console.log(dElem.remove()) // true (meaning successfully removed)
-console.log(dElem.remove()) // false
 
-const dElem2 = ls.unshift(dElem.value)
-
-for (const elem of ls) {
-  console.log(elem) // "a", "b", "c"
-}
-
-ls.reverse()
-
-const addedElems = ls.pushBulk(["x", "y", "z"])
-console.log(ls.toArray()) // ["c", "b", "a", "x", "y", "z"]
-
-addedElems[1].remove()
-console.log(ls.toArray()) // ["c", "b", "a", "x", "z"]
-
-ls.pop() // "z"
-ls.shift() // "c"
-ls.first // "b"
-ls.last // "x"
-
+console.log(ls.first)
+console.log(ls.last)
 console.log(ls.toArray())
-ls.forEachReverse((e) => {
-  console.log(e) // "x", "a", "b"
-})
 
-const clone = new LinkedList(ls)
-ls.clear()
+// const ls = new LinkedList("b", "c")
+// const dElem = ls.push("a")
+// console.log(ls.toArray()) // ["b", "c", "a"]
 
-console.log(clone.toArray())
+// console.log(dElem.remove()) // true (meaning successfully removed)
+// console.log(dElem.remove()) // false
+
+// const dElem2 = ls.unshift(dElem.value)
+
+// for (const elem of ls) {
+//   console.log(elem) // "a", "b", "c"
+// }
+
+// ls.reverse()
+
+// const addedElems = ls.pushBulk(["x", "y", "z"])
+// console.log(ls.toArray()) // ["c", "b", "a", "x", "y", "z"]
+
+// addedElems[1].remove()
+// console.log(ls.toArray()) // ["c", "b", "a", "x", "z"]
+
+// ls.pop() // "z"
+// ls.shift() // "c"
+// ls.first // "b"
+// ls.last // "x"
+
+// console.log(ls.toArray())
+// ls.reverse().forEach((e) => {
+//   console.log(e) // "x", "a", "b"
+// })
+
+// const clone = new LinkedList(ls)
+// ls.clear()
+
+// console.log(clone.toArray())
 
 
-console.log(ls.toArray(), ls.first, ls.last)
+// console.log(ls.toArray(), ls.first, ls.last)
+
 
 
 

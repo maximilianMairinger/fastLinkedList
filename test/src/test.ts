@@ -90,31 +90,12 @@ describe("Core", () => {
         })
       })
 
-      test("foreach reverse", () => {
-        const ex = expect(["d", "c", "b", "a"])
-        ls.forEachReverse((e) => {
-          ex.ordered(e)
-        })
-      })
 
       test("iterator", () => {
         expect(ls[Symbol.iterator]).toBeDefined()
         expect(ls[Symbol.iterator] === ls.iterator).toBeTruthy()
 
         const ex = expect(["a", "b", "c", "d"])
-        const itr = ls.iterator()
-        let res = itr.next()
-        while (!res.done) {
-          ex.ordered(res.value)
-          res = itr.next()
-        }
-      })
-
-      test("iterator reverse", () => {
-        expect(ls.iteratorReverse).toBeDefined()
-        expect(ls[Symbol.iterator] !== ls.iteratorReverse).toBeTruthy()
-
-        const ex = expect(["d", "c", "b", "a"])
         const itr = ls.iterator()
         let res = itr.next()
         while (!res.done) {
