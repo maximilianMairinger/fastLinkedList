@@ -1,6 +1,8 @@
 # Fast linked list
 
-Minimal ([2.4kB](https://bundlephobia.com/package/fast-linked-list)) and fast linked list for the web.
+General purpose, but clean doubly Linked List implementation for the web ([3.4kB](https://bundlephobia.com/package/fast-linked-list)), performing decently well in benchmarks.
+
+> Please note that the length of the list is intentionally not being computed. Token#remove() has no way of mutating the length of the list, as it does not have a reference to it's parent list, only it's siblings. If you need this, use a different library.
 
 ## Installation
 
@@ -9,6 +11,8 @@ Minimal ([2.4kB](https://bundlephobia.com/package/fast-linked-list)) and fast li
 ```
 
 ## Usage
+
+For simple usage, the Token architecture is abstracted away.
 
 ```ts
 import LinkedList from "fast-linked-list"
@@ -45,6 +49,22 @@ ls.forEachReverse((e) => {
 
 const clone = new LinkedList(ls)
 ls.clear()
+```
+
+### Working with Tokens
+
+Tokens can only
+
+```ts
+import LinkedList, { Token } from "fast-linked-list"
+
+const ls1 = new LinkedList("ls", "1")
+const ls2 = new LinkedList("ls", "2")
+const token = new Token("added")
+
+ls1.pushToken(token); ls1.toArray() // ["ls", "1", "added"]
+ls2.pushToken(token); ls2.toArray() // ["ls", "2", "added"]
+ls1.toArray() // ["ls", "1"]
 ```
 
 ## Contribute
