@@ -96,10 +96,22 @@ describe("Core", () => {
       test("foreach", () => {
         const ex = expect(["start", "a", "b", "c", "d", "end"])
         ex.ordered("start")
-        ls.forEach((e) => {
+        ls.forEach((e, tok) => {
           ex.ordered(e)
+          expect(e).toBe(tok.value)
         })
         ex.ordered("end")
+
+
+
+        ls.clear()
+
+        const ex2 = expect(["start", "end"])
+        ex2.ordered("start")
+        ls.forEach((e) => {
+          ex2.ordered(e)
+        })
+        ex2.ordered("end")
       })
 
 

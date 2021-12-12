@@ -152,7 +152,7 @@ const pushOrUnshift = (push: boolean, realDir: boolean = push) => {
     } 
     return cur.value
   }
-  function forEach(f: (val, token) => void) {
+  function each(f: (val, token) => void) {
     let cur = this[headKey]
     let curNext = cur[nextKey]
     while (curNext[nextKey]) {
@@ -174,7 +174,7 @@ const pushOrUnshift = (push: boolean, realDir: boolean = push) => {
     addBulk,
     pop,
     itr,
-    forEach,
+    each,
     first
   }
 }
@@ -189,7 +189,7 @@ function attachFuncs(pr: any, forw: ReturnType<typeof pushOrUnshift>, revs: Retu
   pr.popToken = forw.pop
   pr.shiftToken = revs.pop
   pr.iterator = pr[Symbol.iterator] = forw.itr
-  pr.forEach = forw.forEach
+  pr.forEach = forw.each
   Object.defineProperty(pr, "firstToken", {get: forw.first, configurable: true})
   Object.defineProperty(pr, "lastToken", {get: revs.first, configurable: true})
 }
@@ -202,7 +202,6 @@ const forwInv = pushOrUnshift(false, true)
 
 const pr = _LinkedList.prototype as any
 attachFuncs(pr, forw, revs)
-pr.forEach = itrToEachFunc("iterator")
 pr.pushBulkToken = forcePushBulkToPushTokenBulk("pushTokenBulkForce")
 pr.unshiftBulkToken = forcePushBulkToPushTokenBulk("unshiftTokenBulkForce")
 pr.pushBulk = forcePushBulkToPushBulk("pushTokenBulkForce")
@@ -217,26 +216,6 @@ Object.defineProperty(pr, "first", {get: function() {return this.firstToken.valu
 Object.defineProperty(pr, "last", {get: function() {return this.lastToken.value}, configurable: true})
 
 
-
-
-
-
-function itrToEachFunc(itrKey: string) {
-  return function each(cb: Function) {
-    const itr = this[itrKey]()
-    let result = itr.next();
-    while (!result.done) {
-      cb(result.value)
-      result = itr.next();
-    }
-  }
-}
-
-function forcePushToTokenPush(key: string) {
-  return function(token: Token<any>) {
-    return this[key](token.rm())
-  }
-}
 
 function forcePushBulkToPushTokenBulk(key: string) {
   return function(values: Token<any>[] | LinkedList<Token<any>>, reverse?: boolean) {
