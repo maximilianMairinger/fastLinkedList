@@ -68,8 +68,10 @@ ls1.pushToken(token); ls1.toArray() // ["ls", "1", "added"]
 ls2.pushToken(token); ls2.toArray() // ["ls", "2", "added"]
 ls1.toArray() // ["ls", "1"]
 
+
+// Search for a value of whoms Token is unknown and remove it. Preferably keep a reference to the token if you plan to remove it (as this is O(n)).
 ls2.forEach((val, tok) => {
-  if (val === "added") tok.remove()
+  if (val === "ls") tok.remove()
 })
 ```
 
