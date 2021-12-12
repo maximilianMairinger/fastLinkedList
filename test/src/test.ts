@@ -31,34 +31,42 @@ describe("Core", () => {
     describe("iterate", () => {
       test("Empty", () => {
         const ls = new LinkedList()
-        const ex = expect([])
+        const ex = expect(["start", "end"])
+        ex.ordered("start")
         for (let e of ls) {
-          ex.ordered(e)
+          ex.ordered(e as any)
         }
+        ex.ordered("end")
       })
     
       test("With array elements values", () => {
         const ls = new LinkedList("a", "b", "c", "d")
-        const ex = expect(["a", "b", "c", "d"])
+        const ex = expect(["start", "a", "b", "c", "d", "end"])
+        ex.ordered("start")
         for (let e of ls) {
           ex.ordered(e)
         }
+        ex.ordered("end")
       })
 
       test("With linkedList", () => {
         const ls = new LinkedList(new LinkedList("a", "b", "c", "d"))
-        const ex = expect(["a", "b", "c", "d"])
+        const ex = expect(["start", "a", "b", "c", "d", "end"])
+        ex.ordered("start")
         for (let e of ls) {
           ex.ordered(e)
         }
+        ex.ordered("end")
       })
 
       test("With empty linkedList", () => {
         const ls = new LinkedList(new LinkedList())
-        const ex = expect([])
+        const ex = expect(["start", "end"])
+        ex.ordered("start")
         for (let e of ls) {
-          ex.ordered(e)
+          ex.ordered(e as any)
         }
+        ex.ordered("end")
       })
     })
 
@@ -77,17 +85,21 @@ describe("Core", () => {
 
     describe("Iteration", () => {
       test("forof", () => {
-        const ex = expect(["a", "b", "c", "d"])
+        const ex = expect(["start", "a", "b", "c", "d", "end"])
+        ex.ordered("start")
         for (let e of ls) {
           ex.ordered(e)
         }
+        ex.ordered("end")
       })
 
       test("foreach", () => {
-        const ex = expect(["a", "b", "c", "d"])
+        const ex = expect(["start", "a", "b", "c", "d", "end"])
+        ex.ordered("start")
         ls.forEach((e) => {
           ex.ordered(e)
         })
+        ex.ordered("end")
       })
 
 
@@ -95,21 +107,25 @@ describe("Core", () => {
         expect(ls[Symbol.iterator]).toBeDefined()
         expect(ls[Symbol.iterator] === ls.iterator).toBeTruthy()
 
-        const ex = expect(["a", "b", "c", "d"])
+        const ex = expect(["start", "a", "b", "c", "d", "end"])
+        ex.ordered("start")
         const itr = ls.iterator()
         let res = itr.next()
         while (!res.done) {
           ex.ordered(res.value)
           res = itr.next()
         }
+        ex.ordered("end")
       })
     })
 
     test('Init with LinkedList', () => {
-      const ex = expect(["a", "b", "c", "d"])
+      const ex = expect(["start", "a", "b", "c", "d", "end"])
+      ex.ordered("start")
       for (let e of new LinkedList(ls)) {
         ex.ordered(e)
       }
+      ex.ordered("end")
     })
 
 
@@ -155,18 +171,59 @@ describe("Core", () => {
   
           expect(ls.first).toBe("a")
           expect(ls.last).toBe("e")
-          const ex = expect(["a", "b", "c", "d", "e"])
-          for (const e of ls) ex.ordered(e)
+          expect(["a", "b", "c", "d", "e"]).toEqual(ls.toArray())
         })
+
+
         test('unshift val', () => {
           ls.unshift("9")
   
 
           expect(ls.first).toBe("9")
           expect(ls.last).toBe("d")
-          const ex = expect(["9", "a", "b", "c", "d"])
-          for (const e of ls) ex.ordered(e)
+          expect(["9", "a", "b", "c", "d"]).toEqual(ls.toArray())
         })
+
+
+        test('push single val', () => {
+          ls = new LinkedList()
+          ls.push("a")
+
+          expect(ls.first).toBe("a")
+          expect(ls.last).toBe("a")
+          expect(["a"]).toEqual(ls.toArray())
+        })
+
+        test('unshift single val', () => {
+          ls = new LinkedList()
+          ls.unshift("a")
+
+          expect(ls.first).toBe("a")
+          expect(ls.last).toBe("a")
+          expect(["a"]).toEqual(ls.toArray())
+        })
+
+        test('pushBulk single val', () => {
+          ls = new LinkedList()
+          ls.pushBulk(["a"])
+
+          expect(ls.first).toBe("a")
+          expect(ls.last).toBe("a")
+          expect(["a"]).toEqual(ls.toArray())
+        })
+
+        test('unshiftBulk single val', () => {
+          ls = new LinkedList()
+          ls.unshiftBulk(["a"])
+
+          expect(ls.first).toBe("a")
+          expect(ls.last).toBe("a")
+          expect(["a"]).toEqual(ls.toArray())
+        })
+
+
+
+
   
   
         describe("bulk", () => {
@@ -177,6 +234,7 @@ describe("Core", () => {
             expect(ls.last).toBe("g")
             const ex = expect(["a", "b", "c", "d", "e", "f", "g"])
             for (const e of ls) ex.ordered(e)
+            expect(["a", "b", "c", "d", "e", "f", "g"]).toEqual(ls.toArray())
           })
           test('push bulk linkedlist', () => {
             ls.pushBulk(new LinkedList("e", "f", "g"))
@@ -185,6 +243,7 @@ describe("Core", () => {
             expect(ls.last).toBe("g")
             const ex = expect(["a", "b", "c", "d", "e", "f", "g"])
             for (const e of ls) ex.ordered(e)
+            expect(["a", "b", "c", "d", "e", "f", "g"]).toEqual(ls.toArray())
           })
           test('push bulk array single', () => {
             ls.pushBulk(["e"])
@@ -193,6 +252,7 @@ describe("Core", () => {
             expect(ls.last).toBe("e")
             const ex = expect(["a", "b", "c", "d", "e"])
             for (const e of ls) ex.ordered(e)
+            expect(["a", "b", "c", "d", "e"]).toEqual(ls.toArray())
           })
           test('push bulk array empty', () => {
             ls.pushBulk([])
@@ -201,6 +261,7 @@ describe("Core", () => {
             expect(ls.last).toBe("d")
             const ex = expect(["a", "b", "c", "d"])
             for (const e of ls) ex.ordered(e)
+            expect(["a", "b", "c", "d"]).toEqual(ls.toArray())
           })
 
 
@@ -211,6 +272,7 @@ describe("Core", () => {
             expect(ls.last).toBe("d")
             const ex = expect(["7", "8", "9", "a", "b", "c", "d"])
             for (const e of ls) ex.ordered(e)
+            expect(["7", "8", "9", "a", "b", "c", "d"]).toEqual(ls.toArray())
           })
           test('unshift bulk linkedlist', () => {
             ls.unshiftBulk(new LinkedList("7", "8", "9"))
@@ -219,6 +281,7 @@ describe("Core", () => {
             expect(ls.last).toBe("d")
             const ex = expect(["7", "8", "9", "a", "b", "c", "d"])
             for (const e of ls) ex.ordered(e)
+            expect(["7", "8", "9", "a", "b", "c", "d"]).toEqual(ls.toArray())
           })
           test('unshiftBulk bulk array single', () => {
             ls.unshiftBulk(["9"])
@@ -227,6 +290,7 @@ describe("Core", () => {
             expect(ls.last).toBe("d")
             const ex = expect(["9", "a", "b", "c", "d"])
             for (const e of ls) ex.ordered(e)
+            expect(["9", "a", "b", "c", "d"]).toEqual(ls.toArray())
           })
           test('unshiftBulk bulk array empty', () => {
             ls.unshiftBulk([])
@@ -235,6 +299,7 @@ describe("Core", () => {
             expect(ls.last).toBe("d")
             const ex = expect(["a", "b", "c", "d"])
             for (const e of ls) ex.ordered(e)
+            expect(["a", "b", "c", "d"]).toEqual(ls.toArray())
           })
 
           describe("reverse", () => {
@@ -245,6 +310,7 @@ describe("Core", () => {
               expect(ls.last).toBe("g")
               const ex = expect(["a", "b", "c", "d", "e", "f", "g"])
               for (const e of ls) ex.ordered(e)
+              expect(["a", "b", "c", "d", "e", "f", "g"]).toEqual(ls.toArray())
             })
             test('push bulk linkedlist', () => {
               ls.pushBulk(new LinkedList("g", "f", "e"), true)
@@ -253,6 +319,7 @@ describe("Core", () => {
               expect(ls.last).toBe("g")
               const ex = expect(["a", "b", "c", "d", "e", "f", "g"])
               for (const e of ls) ex.ordered(e)
+              expect(["a", "b", "c", "d", "e", "f", "g"]).toEqual(ls.toArray())
             })
   
   
@@ -263,6 +330,7 @@ describe("Core", () => {
               expect(ls.last).toBe("d")
               const ex = expect(["7", "8", "9", "a", "b", "c", "d"])
               for (const e of ls) ex.ordered(e)
+              expect(["7", "8", "9", "a", "b", "c", "d"]).toEqual(ls.toArray())
             })
             test('unshift bulk linkedlist', () => {
               ls.unshiftBulk(new LinkedList("9", "8", "7"), true)
@@ -271,6 +339,7 @@ describe("Core", () => {
               expect(ls.last).toBe("d")
               const ex = expect(["7", "8", "9", "a", "b", "c", "d"])
               for (const e of ls) ex.ordered(e)
+              expect(["7", "8", "9", "a", "b", "c", "d"]).toEqual(ls.toArray())
             })
           })
         })
@@ -293,6 +362,7 @@ describe("Core", () => {
           expect(ls.last).toBe("c")
           const ex = expect(["a", "b", "c"])
           for (const e of ls) ex.ordered(e)
+          expect(["a", "b", "c"]).toEqual(ls.toArray())
         })
         test('shift', () => {
           ls.shift()
@@ -301,6 +371,7 @@ describe("Core", () => {
           expect(ls.last).toBe("d")
           const ex = expect(["b", "c", "d"])
           for (const e of ls) ex.ordered(e)
+          expect(["b", "c", "d"]).toEqual(ls.toArray())
         })
         test('remove after push', () => {
           const e = ls.push("e")
@@ -309,6 +380,7 @@ describe("Core", () => {
           expect(ls.last).toBe("e")
           const ex1 = expect(["a", "b", "c", "d", "e"])
           for (const e of ls) ex1.ordered(e)
+          expect(["a", "b", "c", "d", "e"]).toEqual(ls.toArray())
 
 
           expect(e.remove()).toBeTruthy()
@@ -316,6 +388,7 @@ describe("Core", () => {
           expect(ls.last).toBe("d")
           const ex2 = expect(["a", "b", "c", "d"])
           for (const e of ls) ex2.ordered(e)
+          expect(["a", "b", "c", "d"]).toEqual(ls.toArray())
 
           const e1 = ls.push("e")
 
@@ -323,6 +396,7 @@ describe("Core", () => {
           expect(ls.last).toBe("e")
           const ex3 = expect(["a", "b", "c", "d", "e"])
           for (const e of ls) ex3.ordered(e)
+          expect(["a", "b", "c", "d", "e"]).toEqual(ls.toArray())
 
           const e2 = ls.push("f")
 
@@ -330,6 +404,7 @@ describe("Core", () => {
           expect(ls.last).toBe("f")
           const ex4 = expect(["a", "b", "c", "d", "e", "f"])
           for (const e of ls) ex4.ordered(e)
+          expect(["a", "b", "c", "d", "e", "f"]).toEqual(ls.toArray())
 
 
           expect(e1.remove()).toBeTruthy()
@@ -338,6 +413,7 @@ describe("Core", () => {
 
           const ex5 = expect(["a", "b", "c", "d", "f"])
           for (const e of ls) ex5.ordered(e)
+          expect(["a", "b", "c", "d", "f"]).toEqual(ls.toArray())
 
           expect(e2.remove()).toBeTruthy()
           expect(ls.first).toBe("a")
@@ -345,6 +421,7 @@ describe("Core", () => {
 
           const ex6 = expect(["a", "b", "c", "d"])
           for (const e of ls) ex6.ordered(e)
+          expect(["a", "b", "c", "d"]).toEqual(ls.toArray())
 
 
 
@@ -359,6 +436,7 @@ describe("Core", () => {
           expect(ls.last).toBe("d")
           const ex7 = expect(["a", "b", "c", "d"])
           for (const e of ls) ex7.ordered(e)
+          expect(["a", "b", "c", "d"]).toEqual(ls.toArray())
         })
         test('remove after unshift', () => {
           const e = ls.unshift("9")
@@ -367,6 +445,7 @@ describe("Core", () => {
           expect(ls.last).toBe("d")
           const ex1 = expect(["9", "a", "b", "c", "d"])
           for (const e of ls) ex1.ordered(e)
+          expect(["9", "a", "b", "c", "d"]).toEqual(ls.toArray())
 
 
           expect(e.remove()).toBeTruthy()
@@ -374,6 +453,7 @@ describe("Core", () => {
           expect(ls.last).toBe("d")
           const ex2 = expect(["a", "b", "c", "d"])
           for (const e of ls) ex2.ordered(e)
+          expect(["a", "b", "c", "d"]).toEqual(ls.toArray())
 
           const e1 = ls.unshift("9")
 
@@ -381,6 +461,7 @@ describe("Core", () => {
           expect(ls.last).toBe("d")
           const ex3 = expect(["9", "a", "b", "c", "d"])
           for (const e of ls) ex3.ordered(e)
+          expect(["9", "a", "b", "c", "d"]).toEqual(ls.toArray())
 
           const e2 = ls.unshift("8")
 
@@ -388,6 +469,7 @@ describe("Core", () => {
           expect(ls.last).toBe("d")
           const ex4 = expect(["8", "9", "a", "b", "c", "d"])
           for (const e of ls) ex4.ordered(e)
+          expect(["8", "9", "a", "b", "c", "d"]).toEqual(ls.toArray())
 
 
           expect(e1.remove()).toBeTruthy()
@@ -396,6 +478,7 @@ describe("Core", () => {
 
           const ex5 = expect(["8", "a", "b", "c", "d"])
           for (const e of ls) ex5.ordered(e)
+          expect(["8", "a", "b", "c", "d"]).toEqual(ls.toArray())
 
           expect(e2.remove()).toBeTruthy()
           expect(ls.first).toBe("a")
@@ -403,6 +486,7 @@ describe("Core", () => {
 
           const ex6 = expect(["a", "b", "c", "d"])
           for (const e of ls) ex6.ordered(e)
+          expect(["a", "b", "c", "d"]).toEqual(ls.toArray())
 
 
 
@@ -417,6 +501,7 @@ describe("Core", () => {
           expect(ls.last).toBe("d")
           const ex7 = expect(["a", "b", "c", "d"])
           for (const e of ls) ex7.ordered(e)
+          expect(["a", "b", "c", "d"]).toEqual(ls.toArray())
         })
         
 
@@ -459,15 +544,18 @@ describe("Core", () => {
               const e = ls.pushBulk(["e", "f", "g"])
               const ex1 = expect(["a", "b", "c", "d", "e", "f", "g"])
               for (const e of ls) ex1.ordered(e)
+              expect(["a", "b", "c", "d", "e", "f", "g"]).toEqual(ls.toArray())
               const e2 = e.pop()
               expect(e2.remove()).toBeTruthy()
               const ex2 = expect(["a", "b", "c", "d", "e", "f"])
               for (const e of ls) ex2.ordered(e)
+              expect(["a", "b", "c", "d", "e", "f"]).toEqual(ls.toArray())
 
 
               expect(e2.remove()).toBeFalsy()
               const ex3 = expect(["a", "b", "c", "d", "e", "f"])
               for (const e of ls) ex3.ordered(e)
+              expect(["a", "b", "c", "d", "e", "f"]).toEqual(ls.toArray())
 
               const e0 = e.shift()
               expect(e0.remove()).toBeTruthy()
@@ -477,18 +565,21 @@ describe("Core", () => {
               
               const ex4 = expect(["a", "b", "c", "d", "f"])
               for (const e of ls) ex4.ordered(e)
+              expect(["a", "b", "c", "d", "f"]).toEqual(ls.toArray())
             })
 
             test("remove after bulk push reverse array", () => {
               const e = ls.pushBulk(["g", "f", "e"], true)
               const ex1 = expect(["a", "b", "c", "d", "e", "f", "g"])
               for (const e of ls) ex1.ordered(e)
+              expect(["a", "b", "c", "d", "e", "f", "g"]).toEqual(ls.toArray())
               const e2 = e.pop()
               expect(e2.remove()).toBeTruthy()
               expect(ls.first).toBe("a")
               expect(ls.last).toBe("g")
               const ex2 = expect(["a", "b", "c", "d", "f", "g"])
               for (const e of ls) ex2.ordered(e)
+              expect(["a", "b", "c", "d", "f", "g"]).toEqual(ls.toArray())
 
 
               expect(e2.remove()).toBeFalsy()
@@ -496,6 +587,7 @@ describe("Core", () => {
               expect(ls.last).toBe("g")
               const ex3 = expect(["a", "b", "c", "d", "f", "g"])
               for (const e of ls) ex3.ordered(e)
+              expect(["a", "b", "c", "d", "f", "g"]).toEqual(ls.toArray())
 
               const e0 = e.shift()
               expect(e0.remove()).toBeTruthy()
@@ -504,21 +596,25 @@ describe("Core", () => {
               expect(ls.last).toBe("f")
               const ex4 = expect(["a", "b", "c", "d", "f"])
               for (const e of ls) ex4.ordered(e)
+              expect(["a", "b", "c", "d", "f"]).toEqual(ls.toArray())
             })
 
             test("remove after bulk push linkedlist", () => {
               const e = ls.pushBulk(new LinkedList("e", "f", "g"))
               const ex1 = expect(["a", "b", "c", "d", "e", "f", "g"])
               for (const e of ls) ex1.ordered(e)
+              expect(["a", "b", "c", "d", "e", "f", "g"]).toEqual(ls.toArray())
               const e2 = e.pop()
               expect(e2.remove()).toBeTruthy()
               const ex2 = expect(["a", "b", "c", "d", "e", "f"])
               for (const e of ls) ex2.ordered(e)
+              expect(["a", "b", "c", "d", "e", "f"]).toEqual(ls.toArray())
 
 
               expect(e2.remove()).toBeFalsy()
               const ex3 = expect(["a", "b", "c", "d", "e", "f"])
               for (const e of ls) ex3.ordered(e)
+              expect(["a", "b", "c", "d", "e", "f"]).toEqual(ls.toArray())
 
               const e0 = e.shift()
               expect(e0.remove()).toBeTruthy()
@@ -528,6 +624,7 @@ describe("Core", () => {
               
               const ex4 = expect(["a", "b", "c", "d", "f"])
               for (const e of ls) ex4.ordered(e)
+              expect(["a", "b", "c", "d", "f"]).toEqual(ls.toArray())
             })
 
             test("remove after bulk unshift array", () => {
@@ -538,11 +635,13 @@ describe("Core", () => {
               expect(e2.remove()).toBeTruthy()
               const ex2 = expect(["7", "8", "a", "b", "c", "d"])
               for (const e of ls) ex2.ordered(e)
+              expect(["7", "8", "a", "b", "c", "d"]).toEqual(ls.toArray())
 
 
               expect(e2.remove()).toBeFalsy()
               const ex3 = expect(["7", "8", "a", "b", "c", "d"])
               for (const e of ls) ex3.ordered(e)
+              expect(["7", "8", "a", "b", "c", "d"]).toEqual(ls.toArray())
 
               const e0 = e.shift()
               expect(e0.remove()).toBeTruthy()
@@ -552,21 +651,25 @@ describe("Core", () => {
               
               const ex4 = expect(["8", "a", "b", "c", "d"])
               for (const e of ls) ex4.ordered(e)
+              expect(["8", "a", "b", "c", "d"]).toEqual(ls.toArray())
             })
 
             test("remove after bulk unshift LinkedList", () => {
               const e = ls.unshiftBulk(new LinkedList("7", "8", "9"))
               const ex1 = expect(["7", "8", "9", "a", "b", "c", "d"])
               for (const e of ls) ex1.ordered(e)
+              expect(["7", "8", "9", "a", "b", "c", "d"]).toEqual(ls.toArray())
               const e2 = e.pop()
               expect(e2.remove()).toBeTruthy()
               const ex2 = expect(["7", "8", "a", "b", "c", "d"])
               for (const e of ls) ex2.ordered(e)
+              expect(["7", "8", "a", "b", "c", "d"]).toEqual(ls.toArray())
 
 
               expect(e2.remove()).toBeFalsy()
               const ex3 = expect(["7", "8", "a", "b", "c", "d"])
               for (const e of ls) ex3.ordered(e)
+              expect(["7", "8", "a", "b", "c", "d"]).toEqual(ls.toArray())
 
               const e0 = e.shift()
               expect(e0.remove()).toBeTruthy()
@@ -576,6 +679,7 @@ describe("Core", () => {
               
               const ex4 = expect(["8", "a", "b", "c", "d"])
               for (const e of ls) ex4.ordered(e)
+              expect(["8", "a", "b", "c", "d"]).toEqual(ls.toArray())
             })
           })
 
@@ -583,17 +687,7 @@ describe("Core", () => {
 
         })
       })
-
-
-
-
-
-      
-
     })
-    
   })
-
-  
 })
 
