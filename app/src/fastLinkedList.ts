@@ -92,16 +92,10 @@ const pushOrUnshift = (push: boolean, realDir: boolean = push) => {
   function add(token: Token<any>) {  
     const tailElem = this[tailKey]
     const end = tailElem[prevKey]
-    if (!(end instanceof End)) {
-      token[prevKey] = end
-      token[nextKey] = tailElem
-      end[nextKey] = token
-    }
-    else {
-      const headElem = this[headKey]
-      headElem[nextKey] = token
-      token[prevKey] = headElem
-    }
+
+    token[prevKey] = end
+    token[nextKey] = tailElem
+    end[nextKey] = token
     return tailElem[prevKey] = token
   }
 
@@ -120,17 +114,10 @@ const pushOrUnshift = (push: boolean, realDir: boolean = push) => {
     
     const token = result.value
     ret.push(token)
+
+    token[prevKey] = end
+    end = end[nextKey] = token
     
-    if (!(end instanceof End)) {
-      token[prevKey] = end
-      end[nextKey] = token
-      end = token
-    }
-    else {
-      const headElem = this[headKey]
-      end = headElem[nextKey] = token
-      end[prevKey] = headElem
-    }
     
     result = itr.next()
     const pushKey = rev ? "unshift" : "push"
@@ -138,8 +125,7 @@ const pushOrUnshift = (push: boolean, realDir: boolean = push) => {
       const token = result.value
       ret[pushKey](token)
       token[prevKey] = end
-      end[nextKey] = token
-      end = token
+      end = end[nextKey] = token
       result = itr.next()
     }
     

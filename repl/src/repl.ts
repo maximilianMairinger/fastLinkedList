@@ -9,15 +9,25 @@ import {List, Item} from "linked-list"
 
 
 
-const ls = new LinkedList("a", "b", "c", "d")
 
-console.log(new LinkedList("7", "8", "9").map(x => new Token(x)))
-ls.unshiftBulk(new LinkedList("7", "8", "9"))
+const ls = new LinkedList<number>(1,2,3,4)
+
+ls.push(5)
 
 
-console.log(ls.first)
-console.log(ls.last)
 console.log(ls.toArray())
+
+
+
+// const ls = new LinkedList("a", "b", "c", "d")
+
+// console.log(new LinkedList("7", "8", "9").map(x => new Token(x)))
+// ls.unshiftBulk(new LinkedList("7", "8", "9"))
+
+
+// console.log(ls.first)
+// console.log(ls.last)
+// console.log(ls.toArray())
 
 // const ls = new LinkedList("b", "c")
 // const dElem = ls.push("a")
