@@ -43,7 +43,7 @@ ls.shift() // "c"
 ls.first // "b"
 ls.last // "x"
 
-ls.forEachReverse((e) => {
+ls.reverse().forEach((e) => {
   console.log(e) // "x", "a", "b"
 })
 
@@ -51,9 +51,11 @@ const clone = new LinkedList(ls)
 ls.clear()
 ```
 
+Note that `reverse()` does not mutate the list, but only inverts all basic i/o functions of the list. E.g.: `push()` becomes `unshift()` and `first` becomes `last`. Hence the `reverse()` call performs with a time complexity of O(1).
+
 ### Working with Tokens
 
-Tokens can only
+A Token can only exsist within one LinkedList. Appending it somewhere else will remove it from the current list.
 
 ```ts
 import LinkedList, { Token } from "fast-linked-list"
@@ -65,6 +67,10 @@ const token = new Token("added")
 ls1.pushToken(token); ls1.toArray() // ["ls", "1", "added"]
 ls2.pushToken(token); ls2.toArray() // ["ls", "2", "added"]
 ls1.toArray() // ["ls", "1"]
+
+ls2.forEach((val, tok) => {
+  if (val === "added") tok.remove()
+})
 ```
 
 ## Contribute
