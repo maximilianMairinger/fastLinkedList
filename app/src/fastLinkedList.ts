@@ -299,19 +299,26 @@ export class Token<T> {
     }
     return suc
   }
-  insertAfter(token: Token<T>) {
+  insertTokenAfter(token: Token<T>) {
     const next = this.next
     this.next = token
     token.prev = this
     token.next = next
     if (next) next.prev = token
   }
-  insertBefore(token: Token<T>) {
+  insertAfter(val: T) {
+    this.insertTokenAfter(new Token(val))
+  }
+
+  insertTokenBefore(token: Token<T>) {
     const prev = this.prev
     this.prev = token
     token.next = this
     token.prev = prev
     if (prev) prev.next = token
+  }
+  insertBefore(val: T) {
+    this.insertTokenBefore(new Token(val))
   }
   rm() {
     this.remove()
