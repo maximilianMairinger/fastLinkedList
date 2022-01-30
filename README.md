@@ -69,6 +69,9 @@ ls2.pushToken(token); ls2.toArray() // ["ls", "2", "added"]
 ls1.toArray() // ["ls", "1"]
 
 
+token.insertBefore("before")
+ls2.toArray() // ["ls", "1", "before", "added"] 
+
 
 // Search for a value whose Token is unknown and remove it. Preferably keep a reference to the token if you plan to remove it (as this is O(n)).
 ls2.forEach((val, tok) => {
