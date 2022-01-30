@@ -299,7 +299,7 @@ export class Token<T> {
     }
     return suc
   }
-  insertTokenAfter(token: Token<T>) {
+  private _insertTokenAfter(token: Token<T>) {
     const next = this.next
     this.next = token
     token.prev = this
@@ -307,10 +307,13 @@ export class Token<T> {
     if (next) next.prev = token
   }
   insertAfter(val: T) {
-    this.insertTokenAfter(new Token(val))
+    this._insertTokenAfter(new Token(val))
+  }
+  insertTokenAfter(token: Token<T>) {
+    this._insertTokenAfter(token.rm())
   }
 
-  insertTokenBefore(token: Token<T>) {
+  private _insertTokenBefore(token: Token<T>) {
     const prev = this.prev
     this.prev = token
     token.next = this
@@ -318,7 +321,10 @@ export class Token<T> {
     if (prev) prev.next = token
   }
   insertBefore(val: T) {
-    this.insertTokenBefore(new Token(val))
+    this._insertTokenBefore(new Token(val))
+  }
+  insertTokenBefore(token: Token<T>) {
+    this._insertTokenBefore(token.rm())
   }
   rm() {
     this.remove()
