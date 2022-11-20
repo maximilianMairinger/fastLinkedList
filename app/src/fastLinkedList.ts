@@ -27,7 +27,9 @@ class _LinkedList<T> {
   }
 
 
-
+  get empty() {
+    return this.head.next === this.tail
+  }
 
   reverse(): this {
     if (this.reversed = !this.reversed) {
@@ -243,6 +245,7 @@ export type LinkedList<T> = _LinkedList<T> & {
   popToken(): Token<T>,
   shift(): T,
   shiftToken(): Token<T>,
+  empty: boolean,
 
   push: (value: T) => Token<T>,
   pushToken: (value: Token<T>) => Token<T>,

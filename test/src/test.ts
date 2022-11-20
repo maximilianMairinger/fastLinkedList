@@ -23,9 +23,11 @@ describe("Core", () => {
       new LinkedList(new LinkedList("a", "b", "c", "d"))
     })
 
+
     test('With empty linkedList', () => {
       new LinkedList(new LinkedList())
     })
+
 
 
     describe("iterate", () => {
@@ -75,11 +77,19 @@ describe("Core", () => {
 
   
 
-
   describe("static", () => {
     let ls: LinkedList<string>
     beforeEach(() => {
       ls = new LinkedList("a", "b", "c", "d")
+    })
+
+    test("Empty prop", () => {
+      const l = new LinkedList()
+      expect(l.empty).toBe(true)
+      const ll = new LinkedList("a", "b", "c", "d")
+      expect(ll.empty).toBe(false)
+      const lll = new LinkedList(new LinkedList("a"))
+      expect(lll.empty).toBe(false)
     })
 
 
@@ -234,6 +244,31 @@ describe("Core", () => {
         })
 
 
+        describe("empty", () => {
+          const l = new LinkedList("a", "b", "c", "d")
+          l.pop()
+          expect(l.empty).toBe(false)
+          l.pop()
+          l.pop()
+          expect(l.empty).toBe(false)
+          l.pop()
+          expect(l.empty).toBe(true)
+          const tok = l.push("lel")
+          expect(l.empty).toBe(false)
+          tok.remove()
+          expect(l.empty).toBe(true)
+          l.pushToken(tok)
+          expect(l.empty).toBe(false)
+          l.push("woo")
+          l.unshift("qq")
+          tok.rm()
+          l.shift()
+          expect(l.empty).toBe(false)
+          l.shift()
+          expect(l.empty).toBe(true)
+        })
+
+
 
 
   
@@ -313,6 +348,21 @@ describe("Core", () => {
             for (const e of ls) ex.ordered(e)
             expect(["a", "b", "c", "d"]).toEqual(ls.toArray())
           })
+          
+          test("Empty prop", () => {
+            const l = new LinkedList("a")
+            expect(l.empty).toBe(false)
+            l.pop()
+            expect(l.empty).toBe(true)
+            l.pushBulk(["a", "b", "c"])
+            expect(l.empty).toBe(false)
+            l.pop()
+            l.pop()
+            expect(l.empty).toBe(false)
+            l.shift()
+            expect(l.empty).toBe(true)
+          })
+
 
           describe("reverse", () => {
             test('push bulk array', () => {
@@ -355,14 +405,6 @@ describe("Core", () => {
             })
           })
         })
-  
-  
-        
-        
-        
-  
-  
-        
       })
      
 
