@@ -15,7 +15,7 @@
     "build": "npm run buildCJS && npm run buildESM",
     "buildCJS": "del-cli app/dist/cjs && tsc -p ./tsconfig.prod.cjs.json",
     "buildESM": "npx del-cli app/dist/esm && tsc -p ./tsconfig.prod.esm.json && npx ncp app/dist/esm app/dist/esm2; npx renamer --find /\\.js$/i --replace .mjs app/dist/esm2/**; npx ncp app/dist/esm2 app/dist/esm; npx del-cli app/dist/esm2",
-    "dev": "npm run devNode",
+    "dev": "npm run devWeb",
     "devWeb": "rollup --config rollup.web.dev.config.js -w",
     "devNode": "rollup --config rollup.node.dev.config.js -w",
     "deploy": "npm run build && npm publish",

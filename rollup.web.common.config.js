@@ -11,9 +11,8 @@ export default {
   output: {
     file: 'repl/dist/fastLinkedList-repl.js',
     format: 'cjs',
-    sourcemap: true
+    sourcemap: "inline"
   },
-  sourcemap: true,
   plugins: [
     typescript({tsconfig: "./tsconfig.dev.json", noEmitOnError: false, sourceMap: true}), 
     resolve({browser: true}),

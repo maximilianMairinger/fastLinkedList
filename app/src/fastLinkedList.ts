@@ -17,7 +17,7 @@ class _LinkedList<T> {
   constructor(ls: LinkedList<T>, reverse: boolean)
   constructor(...initValues: T[])
   constructor(...initValues: any[]) {
-    (this.clear() as any).pushBulk(...(initValues[0] instanceof LinkedList ? [initValues[0], initValues[1]] : [initValues]))
+    (this.clear() as any).pushBulk(...(initValues[0] instanceof LinkedList ? initValues : [initValues]))
   }
 
   clear(): this {
@@ -33,16 +33,17 @@ class _LinkedList<T> {
 
   reverse(): this {
     if (this.reversed = !this.reversed) {
-      attachFuncs(this, forwInv, revsInv)
+      attachPrimitives(this, forwInv, revsInv)
     }
     else {
-      attachFuncs(this, forw, revs)
+      attachPrimitives(this, forw, revs)
     }
 
     return this
   }
   map<W>(cb: (e: T) => W): LinkedList<W> {
-    const n = new LinkedList<W>();
+    //@ts-ignore 
+    const n = new this.constructor();
     for (const e of this as any) {
       n.push(cb(e))
     }
@@ -183,7 +184,74 @@ const pushOrUnshift = (push: boolean, realDir: boolean = push) => {
 
 
 
-function attachFuncs(pr: any, forw: ReturnType<typeof pushOrUnshift>, revs: ReturnType<typeof pushOrUnshift>) {
+
+export class Token<T = unknown> {
+  public next?: Token<T>
+  public prev?: Token<T>
+  constructor(public value: T) {
+
+  }
+  remove() {
+    let suc = false
+    const next = this.next
+    const prev = this.prev
+    if (this.next) {
+      //@ts-ignore
+      next.prev = prev
+      this.next = undefined
+      suc = true
+    }
+    if (this.prev) {
+      //@ts-ignore
+      prev.next = next
+      this.prev = undefined
+      suc = true
+    }
+    return suc
+  }
+  protected _insertTokenAfter(token: Token<T>) {
+    const next = this.next
+    this.next = token
+    token.prev = this
+    token.next = next
+    if (next) next.prev = token
+  }
+  insertAfter(val: T) {
+    this._insertTokenAfter(new Token(val))
+  }
+  insertTokenAfter(token: Token<T>) {
+    this._insertTokenAfter(token.rm())
+  }
+
+  protected _insertTokenBefore(token: Token<T>) {
+    const prev = this.prev
+    this.prev = token
+    token.next = this
+    token.prev = prev
+    if (prev) prev.next = token
+  }
+  insertBefore(val: T) {
+    this._insertTokenBefore(new Token(val))
+  }
+  insertTokenBefore(token: Token<T>) {
+    this._insertTokenBefore(token.rm())
+  }
+  rm() {
+    this.remove()
+    return this
+  }
+}
+
+const forcePushBulkToPushBulk = forcePushBulkToPushBulkWithToken(Token)
+function forcePushBulkToPushBulkWithToken(Tok: {new<T>(val: T, that?: any): Token<T>}) {
+  return function forcePushBulkToPushBulk(funcKey: string) {
+    return function(values: any[], reverse?: boolean) {
+      return this[funcKey](values.map(val => new Tok(val, this)), reverse)
+    }
+  }
+}
+
+function attachPrimitives(pr: any, forw: ReturnType<typeof pushOrUnshift>, revs: ReturnType<typeof pushOrUnshift>) {
   pr.pushTokenForce = forw.add
   pr.pushTokenBulkForce = forw.addBulk
   pr.unshiftTokenForce = revs.add
@@ -203,7 +271,7 @@ const forwInv = pushOrUnshift(false, true)
 
 
 const pr = _LinkedList.prototype as any
-attachFuncs(pr, forw, revs)
+attachPrimitives(pr, forw, revs)
 pr.pushBulkToken = forcePushBulkToPushTokenBulk("pushTokenBulkForce")
 pr.unshiftBulkToken = forcePushBulkToPushTokenBulk("unshiftTokenBulkForce")
 pr.pushBulk = forcePushBulkToPushBulk("pushTokenBulkForce")
@@ -228,42 +296,41 @@ function forcePushBulkToPushTokenBulk(key: string) {
   }
 }
 
-function forcePushBulkToPushBulk(key: string) {
-  return function(values: any[], reverse?: boolean) {
-    return this[key](values.map(val => new Token(val)), reverse)
-  }
-}
 
 
 
+declare class TypeLinkedList<T> extends _LinkedList<T> {
+  protected pushTokenForce(token: Token<T>): Token<T>
+  protected pushTokenBulkForce(tokens: Token<T>[], reverse?: boolean): Token<T>
+  protected unshiftTokenForce(token: Token<T>): Token<T>
+  protected unshiftTokenBulkForce(tokens: Token<T>[], reverse?: boolean): Token<T>
 
+  forEach: (cb: (val: T, token: Token<T>) => void) => void
+  pop(): T
+  popToken(): Token<T>
+  shift(): T
+  shiftToken(): Token<T>
 
-
-export type LinkedList<T> = _LinkedList<T> & {
-  forEach: (cb: (val: T, token: Token<T>) => void) => void,
-  pop(): T,
-  popToken(): Token<T>,
-  shift(): T,
-  shiftToken(): Token<T>,
-  empty: boolean,
-
-  push: (value: T) => Token<T>,
-  pushToken: (value: Token<T>) => Token<T>,
-  pushBulk: ((values: T[], reverseValues?: boolean) => Token<T>[]) & ((values: LinkedList<T>, reverse?: boolean) => LinkedList<Token<T>>),
-  pushTokenBulk: ((values: Token<T>[], reverseValues?: boolean) => Token<T>[]) & ((values: LinkedList<Token<T>>, reverse?: boolean) => LinkedList<Token<T>>),
+  push: (value: T) => Token<T>
+  pushToken: (value: Token<T>) => Token<T>
+  pushBulk: ((values: T[], reverseValues?: boolean) => Token<T>[]) & ((values: LinkedList<T>, reverse?: boolean) => LinkedList<Token<T>>)
+  pushTokenBulk: ((values: Token<T>[], reverseValues?: boolean) => Token<T>[]) & ((values: LinkedList<Token<T>>, reverse?: boolean) => LinkedList<Token<T>>)
   
-  unshift: (value: T) => Token<T>,
-  unshiftToken: (value: Token<T>) => Token<T>,
-  unshiftBulk: ((values: T[], reverseValues?: boolean) => Token<T>[]) & ((values: LinkedList<T>, reverse?: boolean) => LinkedList<Token<T>>),
-  unshiftTokenBulk: ((values: Token<T>[], reverseValues?: boolean) => Token<T>[]) & ((values: LinkedList<Token<T>>, reverse?: boolean) => LinkedList<Token<T>>),
+  unshift: (value: T) => Token<T>
+  unshiftToken: (value: Token<T>) => Token<T>
+  unshiftBulk: ((values: T[], reverseValues?: boolean) => Token<T>[]) & ((values: LinkedList<T>, reverse?: boolean) => LinkedList<Token<T>>)
+  unshiftTokenBulk: ((values: Token<T>[], reverseValues?: boolean) => Token<T>[]) & ((values: LinkedList<Token<T>>, reverse?: boolean) => LinkedList<Token<T>>)
   
-  iterator: () => Iterator<T, T, unknown>,
-  [Symbol.iterator]: () => Iterator<T, T, unknown>,
-  first: T,
-  last: T,
-  firstToken: Token<T>,
+  iterator: () => Iterator<T, T, unknown>
+  [Symbol.iterator]: () => Iterator<T, T, unknown>
+  first: T
+  last: T
+  firstToken: Token<T>
   lastToken: Token<T>
 }
+
+export type LinkedList<T = unknown> = TypeLinkedList<T>
+
 export const LinkedList = _LinkedList as {
   new<T>(ls: LinkedList<T>): LinkedList<T>
   new<T>(...initValues: T[]): LinkedList<T>
@@ -275,62 +342,71 @@ export default LinkedList
 
 
 
+export class LengthLinkedList<T> extends LinkedList<T> {
+  private _length = 0
+  get length() {return this._length}
 
-
-
-export class Token<T> {
-  public next?: Token<T>
-  public prev?: Token<T>
-  constructor(public value: T) {
-
+  constructor(ls: LengthLinkedList<T>, revers?: boolean)
+  constructor(...initValues: T[])
+  constructor(...initValues: T[]) {
+    super(...initValues)
   }
-  remove() {
-    let suc = false
-    const next = this.next
-    const prev = this.prev
-    if (this.next) {
-      //@ts-ignore
-      next.prev = prev
-      this.next = undefined
-      suc = true
-    }
-    if (this.prev) {
-      //@ts-ignore
-      prev.next = next
-      this.prev = undefined
-      suc = true
-    }
-    return suc
-  }
-  private _insertTokenAfter(token: Token<T>) {
-    const next = this.next
-    this.next = token
-    token.prev = this
-    token.next = next
-    if (next) next.prev = token
-  }
-  insertAfter(val: T) {
-    this._insertTokenAfter(new Token(val))
-  }
-  insertTokenAfter(token: Token<T>) {
-    this._insertTokenAfter(token.rm())
-  }
-
-  private _insertTokenBefore(token: Token<T>) {
-    const prev = this.prev
-    this.prev = token
-    token.next = this
-    token.prev = prev
-    if (prev) prev.next = token
-  }
-  insertBefore(val: T) {
-    this._insertTokenBefore(new Token(val))
-  }
-  insertTokenBefore(token: Token<T>) {
-    this._insertTokenBefore(token.rm())
-  }
-  rm() {
-    this.remove()
-    return this
+  clear() {
+    this._length = 0
+    return super.clear()
   }
 }
+
+const prL = LengthLinkedList.prototype as any
+for (const funcName of ["unshiftTokenBulkForce", "pushTokenBulkForce"]) {
+  const f = prL[funcName]
+  prL[funcName] = function(...a) {
+    this._length += a[0].length
+    return f.apply(this, a)
+  }
+}
+
+for (const funcName of ["unshiftTokenForce", "pushTokenForce"]) {
+  const f = prL[funcName]
+  prL[funcName] = function(...a) {
+    this._length++
+    return f.apply(this, a)
+  }
+}
+
+for (const funcName of ["popToken", "shiftToken"]) {
+  const f = prL[funcName]
+  prL[funcName] = function(...a) {
+    this._length--
+    return f.apply(this, a)
+  }
+}
+
+prL.push = function(val: any) {return this.pushTokenForce(new LengthToken(val, this))}
+prL.unshift = function(val: any) {return this.unshiftTokenForce(new LengthToken(val, this))}
+
+
+export class LengthToken<T = unknown> extends Token<T> {
+  constructor(val: T, protected that: LinkedList<T>) {
+    super(val);
+  }
+  insertAfter(val: T) {
+    this._insertTokenAfter(new LengthToken(val, this.that))
+  }
+  insertBefore(val: T) {
+    this._insertTokenBefore(new LengthToken(val, this.that))
+  }
+  protected _insertTokenBefore(token: LengthToken<T>) {
+    (this.that as any)._length++
+    return super._insertTokenBefore(token)
+  }
+  protected _insertTokenAfter(token: LengthToken<T>): void {
+    (this.that as any)._length++
+    return super._insertTokenBefore(token)
+  }
+  remove() {
+    (this.that as any)._length--
+    return super.remove()
+  }
+}
+

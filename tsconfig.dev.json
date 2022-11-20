@@ -6,6 +6,8 @@
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
     "allowJs": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    // "sourceMap": true,
+    "inlineSourceMap": true
   }
 }

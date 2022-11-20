@@ -1,4 +1,4 @@
-import {LinkedList, Token} from "./../../app/src/fastLinkedList"
+import {LinkedList, Token, LengthLinkedList} from "./../../app/src/fastLinkedList"
 //const testElem = document.querySelector("#test")
 // import yallist from "yallist"
 import * as yallist from "yallist"
@@ -8,17 +8,9 @@ import timoi from "timoi"
 import {List, Item} from "linked-list"
 
 
-
-
-const ls = new LinkedList<number>(1,2,3,4)
-ls.push
-const tok = ls.push(5)
-tok.insertBefore(77)
-
-
-console.log(ls.toArray())
-
-
+const ll = new LengthLinkedList("a", "b", "c", "d")
+debugger
+console.log(ll.length)
 
 // const ls = new LinkedList("a", "b", "c", "d")
 
