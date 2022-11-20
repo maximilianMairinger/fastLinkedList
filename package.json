@@ -2,19 +2,19 @@
   "name": "fast-linked-list",
   "version": "3.1.1",
   "description": "General purpose, but clean doubly Linked List implementation for the web.",
-  "main": "./app/dist/esm/fastLinkedList.mjs",
+  "main": "./app/dist/esm/fastLinkedList.js",
   "types": "./app/dist/esm/fastLinkedList.d.ts",
   "exports": {
     "node": {
       "import": "./app/dist/esm/fastLinkedList.mjs",
       "require": "./app/dist/cjs/fastLinkedList.js"
     },
-    "default": "./app/dist/esm/fastLinkedList.mjs"
+    "default": "./app/dist/esm/fastLinkedList.js"
   },
   "scripts": {
     "build": "npm run buildCJS && npm run buildESM",
     "buildCJS": "del-cli app/dist/cjs && tsc -p ./tsconfig.prod.cjs.json",
-    "buildESM": "del-cli app/dist/esm && tsc -p ./tsconfig.prod.esm.json && renamer --find /\\.js$/i --replace .mjs app/dist/esm/**",
+    "buildESM": "npx del-cli app/dist/esm && tsc -p ./tsconfig.prod.esm.json && npx ncp app/dist/esm app/dist/esm2; npx renamer --find /\\.js$/i --replace .mjs app/dist/esm2/**; npx ncp app/dist/esm2 app/dist/esm; npx del-cli app/dist/esm2",
     "dev": "npm run devNode",
     "devWeb": "rollup --config rollup.web.dev.config.js -w",
     "devNode": "rollup --config rollup.node.dev.config.js -w",
