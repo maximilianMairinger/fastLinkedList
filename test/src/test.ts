@@ -1,4 +1,4 @@
-import _LinkedList, {LengthLinkedList, Token as _Token, LengthToken} from "../../app/src/fastLinkedList"
+import _LinkedList, {LengthLinkedList, Token as _Token, LengthToken, End, Head, Tail} from "../../app/src/fastLinkedList"
 import "./extend"
 
 
@@ -7,6 +7,18 @@ describe("LinkedList", () => {
 })
 describe("LengthLinkedList", () => {
   go(LengthLinkedList, LengthToken as any)
+
+
+  // describe("Spesific lengt prop test", () => {
+  //   test("Static", () => {
+  //     const l = new LengthLinkedList()
+  //     expect(l.length).toBe(0)
+  //     const ll = new LengthLinkedList("a", "b", "c", "d")
+  //     expect(ll.length).toBe(4)
+  //     const lll = new LengthLinkedList(new LengthLinkedList("a"))
+  //     expect(lll.length).toBe(1)
+  //   })
+  // })
 })
 
 function go(LinkedList: typeof _LinkedList, Token: typeof _Token) {
@@ -415,8 +427,8 @@ function go(LinkedList: typeof _LinkedList, Token: typeof _Token) {
   
         describe("remove", () => {
           test('pop', () => {
-            ls.pop()
-  
+            const r = ls.pop()
+            expect(r).toBe("d")
             expect(ls.first).toBe("a")
             expect(ls.last).toBe("c")
             const ex = expect(["a", "b", "c"])
@@ -424,8 +436,8 @@ function go(LinkedList: typeof _LinkedList, Token: typeof _Token) {
             expect(["a", "b", "c"]).toEqual(ls.toArray())
           })
           test('shift', () => {
-            ls.shift()
-  
+            const r = ls.shift()
+            expect(r).toBe("a")
             expect(ls.first).toBe("b")
             expect(ls.last).toBe("d")
             const ex = expect(["b", "c", "d"])
@@ -746,9 +758,423 @@ function go(LinkedList: typeof _LinkedList, Token: typeof _Token) {
   
           })
         })
+        describe("Token handeling", () => {
+          let ls: _LinkedList<any>
+          beforeEach(() => {
+            ls = new LinkedList()
+          })
+
+          test("From constructor", () => {
+            // @ts-ignore
+            const tok = new Token("lel", ls)
+            expect(tok.value).toBe("lel")
+            expect(tok.next).toBe(undefined)
+            expect(tok.prev).toBe(undefined)
+
+            const tok2 = ls.pushToken(tok)
+            expect(tok2).toBe(tok)
+            expect(ls.toArray()).toEqual(["lel"])
+            tok2.value = "change"
+            expect(tok2.value).toBe("change")
+            expect(ls.first).toBe("change")
+            expect(ls.toArray()).toEqual(["change"])
+          })
+          describe("Singlular inherent", () => {
+            test("push", () => {
+              const tok = new Token("lel")
+
+              const t2 = ls.push(tok)
+              expect(ls.first).toBe(tok)
+              expect(ls.last).toBe(tok)
+              expect(ls.empty).toBe(false)
+              expect(ls.firstToken).toBeInstanceOf(Token)
+              expect(ls.firstToken).toBe(t2)
+              expect(ls.lastToken).toBe(t2)
+              expect(ls.firstToken.value).toBe(tok)
+
+              const t3 = ls.push("2")
+              expect(ls.last).toBe("2")
+              expect(ls.first).toBe(tok)
+              expect(ls.lastToken.prev.value).toBe(tok)
+              expect(ls.firstToken.next).toBe(t3)
+            })
+            test("unshift", () => {
+              const tok = new Token("lel")
+
+              const t2 = ls.unshift(tok)
+              expect(ls.first).toBe(tok)
+              expect(ls.last).toBe(tok)
+              expect(ls.empty).toBe(false)
+              expect(ls.firstToken).toBeInstanceOf(Token)
+              expect(ls.firstToken).toBe(t2)
+              expect(ls.lastToken).toBe(t2)
+              expect(ls.firstToken.value).toBe(tok)
+
+              const t3 = ls.unshift("2")
+              expect(ls.first).toBe("2")
+              expect(ls.last).toBe(tok)
+              expect(ls.lastToken.prev.value).toBe("2")
+              expect(ls.firstToken.next).toBe(t2)
+            })
+
+            test("Head tail", () => {
+              const h = new Head()
+              const t = new Tail()
+              expect("value" in h).toBe(false)
+              expect("value" in t).toBe(false)
+              expect(h).toBeInstanceOf(End)
+              expect(t).toBeInstanceOf(End)
+            })
+
+            test("pop", () => {
+              const tok = new Token("lel")
+              const t2 = ls.push(tok)
+              const t3 = ls.push("2")
+              const t4 = ls.push("3")
+
+              expect(ls.last).toBe("3")
+              expect(ls.lastToken).toBe(t4)
+              expect(ls.lastToken.value).toBe("3")
+              expect(ls.lastToken.next).toBeInstanceOf(End)
+              expect(ls.lastToken.prev).toBe(t3)
+
+              const v5 = ls.pop()
+              expect(v5).toBe(t4.value)
+              expect(ls.last).toBe("2")
+              expect(ls.lastToken).toBe(t3)
+              expect(ls.lastToken.value).toBe("2")
+              expect(ls.lastToken.next).toBeInstanceOf(End)
+              expect(ls.lastToken.prev).toBe(t2)
+
+              const v6 = ls.pop()
+              expect(v6).toBe(t3.value)
+              expect(ls.last).toBe(tok)
+              expect(ls.lastToken).toBe(t2)
+              expect(ls.lastToken.value).toBe(tok)
+              expect(ls.lastToken.next).toBeInstanceOf(End)
+              expect(ls.lastToken.prev).toBeInstanceOf(End)
+
+              const v7 = ls.pop()
+              expect(v7).toBe(t2.value)
+              expect(ls.last).toBe(undefined)
+              expect(ls.lastToken).toBeInstanceOf(End)
+              expect(ls.empty).toBe(true)
+
+              expect(() => ls.pop()).toThrowError()
+            })
+
+            test("popToken", () => {
+              const tok = new Token("lel")
+              const t2 = ls.push(tok)
+              const t3 = ls.push("2")
+              const t4 = ls.push("3")
+
+              expect(ls.last).toBe("3")
+              expect(ls.lastToken).toBe(t4)
+              expect(ls.lastToken.value).toBe("3")
+              expect(ls.lastToken.next).toBeInstanceOf(End)
+              expect(ls.lastToken.prev).toBe(t3)
+
+              const v5 = ls.popToken()
+              expect(v5).toBe(t4)
+              expect(ls.last).toBe("2")
+              expect(ls.lastToken).toBe(t3)
+              expect(ls.lastToken.value).toBe("2")
+              expect(ls.lastToken.next).toBeInstanceOf(End)
+              expect(ls.lastToken.prev).toBe(t2)
+
+              const v6 = ls.popToken()
+              expect(v6).toBe(t3)
+              expect(ls.last).toBe(tok)
+              expect(ls.lastToken).toBe(t2)
+              expect(ls.lastToken.value).toBe(tok)
+              expect(ls.lastToken.next).toBeInstanceOf(End)
+              expect(ls.lastToken.prev).toBeInstanceOf(End)
+
+              const v7 = ls.popToken()
+              expect(v7).toBe(t2)
+              expect(ls.last).toBe(undefined)
+              expect(ls.lastToken).toBeInstanceOf(End)
+              expect(ls.empty).toBe(true)
+
+              expect(() => ls.popToken()).toThrowError()
+            })
+
+            test("shift", () => {
+              const tok = new Token("lel")
+              const t2 = ls.push(tok)
+              const t3 = ls.push("2")
+              const t4 = ls.push("3")
+
+              expect(ls.first).toBe(tok)
+              expect(ls.firstToken).toBe(t2)
+              expect(ls.firstToken.value).toBe(tok)
+              expect(ls.firstToken.next).toBe(t3)
+              expect(ls.firstToken.prev).toBeInstanceOf(End)
+
+              const v5 = ls.shift()
+              expect(v5).toBe(t2.value)
+              expect(ls.first).toBe("2")
+              expect(ls.firstToken).toBe(t3)
+              expect(ls.firstToken.value).toBe("2")
+              expect(ls.firstToken.next).toBe(t4)
+              expect(ls.firstToken.prev).toBeInstanceOf(End)
+
+              const v6 = ls.shift()
+              expect(v6).toBe(t3.value)
+              expect(ls.first).toBe("3")
+              expect(ls.firstToken).toBe(t4)
+              expect(ls.firstToken.value).toBe("3")
+              expect(ls.firstToken.next).toBeInstanceOf(End)
+              expect(ls.firstToken.prev).toBeInstanceOf(End)
+
+              const v7 = ls.shift()
+              expect(v7).toBe(t4.value)
+              expect(ls.first).toBe(undefined)
+              expect(ls.firstToken).toBeInstanceOf(End)
+              expect(ls.empty).toBe(true)
+
+              expect(() => ls.shift()).toThrowError()
+            })
+
+            test("shiftToken", () => {
+              const tok = new Token("lel")
+              const t2 = ls.push(tok)
+              const t3 = ls.push("2")
+              const t4 = ls.push("3")
+
+              expect(ls.first).toBe(tok)
+              expect(ls.firstToken).toBe(t2)
+              expect(ls.firstToken.value).toBe(tok)
+              expect(ls.firstToken.next).toBe(t3)
+              expect(ls.firstToken.prev).toBeInstanceOf(End)
+
+              const v5 = ls.shiftToken()
+              expect(v5).toBe(t2)
+              expect(ls.first).toBe("2")
+              expect(ls.firstToken).toBe(t3)
+              expect(ls.firstToken.value).toBe("2")
+              expect(ls.firstToken.next).toBe(t4)
+              expect(ls.firstToken.prev).toBeInstanceOf(End)
+
+              const v6 = ls.shiftToken()
+              expect(v6).toBe(t3)
+              expect(ls.first).toBe("3")
+              expect(ls.firstToken).toBe(t4)
+              expect(ls.firstToken.value).toBe("3")
+              expect(ls.firstToken.next).toBeInstanceOf(End)
+              expect(ls.firstToken.prev).toBeInstanceOf(End)
+
+              const v7 = ls.shiftToken()
+              expect(v7).toBe(t4)
+              expect(ls.first).toBe(undefined)
+              expect(ls.firstToken).toBeInstanceOf(End)
+              expect(ls.empty).toBe(true)
+
+              expect(() => ls.shiftToken()).toThrowError()
+            })
+
+
+
+
+            describe("bulk", () => {
+              test("push bulk", () => {
+                // @ts-ignore
+                const tok = new Token("lel", ls)
+                // @ts-ignore
+                const tok2 = new Token("lel2", ls)
+                // @ts-ignore
+                const tok3 = new Token("lel3", ls)
+                // @ts-ignore
+                const tok4 = new Token("lel4", ls)
+
+                const ret = ls.pushTokenBulk([tok, tok2, tok3, tok4])
+                expect(ls.first).toBe(tok.value)
+                expect(ls.last).toBe(tok4.value)
+                expect(ls.firstToken).toBeInstanceOf(Token)
+                expect(ls.firstToken).toBe(tok)
+                expect(ls.lastToken).toBeInstanceOf(Token)
+                expect(ls.lastToken).toBe(tok4)
+                expect(ls.firstToken.next).toBeInstanceOf(Token)
+                expect(ls.firstToken.next).toBe(tok2)
+                
+                expect(ret).toBeInstanceOf(Array)
+                expect(ret.length).toBe(4)
+                expect(ret[0]).toBe(tok)
+                expect(ret[1]).toBe(tok2)
+                expect(ret[2]).toBe(tok3)
+                expect(ret[3]).toBe(tok4)
+
+                expect(ls.toArray()).toEqual([tok.value, tok2.value, tok3.value, tok4.value])
+            })
+
+            test("unshift bulk", () => {
+              // @ts-ignore
+              const tok = new Token("lel", ls)
+              // @ts-ignore
+              const tok2 = new Token("lel2", ls)
+              // @ts-ignore
+              const tok3 = new Token("lel3", ls)
+              // @ts-ignore
+              const tok4 = new Token("lel4", ls)
+
+              const ret = ls.unshiftTokenBulk([tok, tok2, tok3, tok4])
+              expect(ls.first).toBe(tok.value)
+              expect(ls.last).toBe(tok4.value)
+              expect(ls.firstToken).toBeInstanceOf(Token)
+              expect(ls.firstToken).toBe(tok)
+              expect(ls.lastToken).toBeInstanceOf(Token)
+              expect(ls.lastToken).toBe(tok4)
+              expect(ls.firstToken.next).toBeInstanceOf(Token)
+              expect(ls.firstToken.next).toBe(tok2)
+              
+              expect(ret).toBeInstanceOf(Array)
+              expect(ret.length).toBe(4)
+              expect(ret[0]).toBe(tok)
+              expect(ret[1]).toBe(tok2)
+              expect(ret[2]).toBe(tok3)
+              expect(ret[3]).toBe(tok4)
+
+              expect(ls.toArray()).toEqual([tok.value, tok2.value, tok3.value, tok4.value])
+          })
+          describe("remove", () => {
+            test("remove api", () => {
+              const tok = ls.push("lel")
+              expect(tok.remove()).toBeTruthy()
+              expect(ls.empty).toBeTruthy()
+              expect(tok.remove()).toBeFalsy()
+              expect(ls.empty).toBeTruthy()
+
+              const tok2 = ls.push("lel")
+              const tok3 = ls.push("lel2")
+              expect(tok2.remove()).toBeTruthy()
+              expect(ls.empty).toBeFalsy()
+              expect(tok2.remove()).toBeFalsy()
+              expect(ls.empty).toBeFalsy()
+              expect(tok3.remove()).toBeTruthy()
+              expect(ls.empty).toBeTruthy()
+              expect(tok3.remove()).toBeFalsy()
+              expect(ls.empty).toBeTruthy()
+
+              const tok4 = ls.push("lel")
+              const tok5 = ls.push("lel2")
+              
+              expect(tok4.rm()).toBe(tok4)
+              expect(ls.empty).toBeFalsy()
+              expect(tok4.rm()).toBe(tok4)
+              expect(ls.empty).toBeFalsy()
+              expect(tok5.rm()).toBe(tok5)
+              expect(ls.empty).toBeTruthy()
+              expect(tok5.rm()).toBe(tok5)
+              expect(ls.empty).toBeTruthy()
+            })
+
+            test("Remove unsets next prev props", () => {
+              const tok = ls.push("lel")
+              expect(tok.remove()).toBeTruthy()
+              expect(ls.empty).toBeTruthy()
+              expect(tok.remove()).toBeFalsy()
+              expect(ls.empty).toBeTruthy()
+
+              const tok2 = ls.push("lel")
+              const tok3 = ls.push("lel2")
+              expect(tok2.remove()).toBeTruthy()
+              expect(ls.empty).toBeFalsy()
+              expect(tok2.remove()).toBeFalsy()
+
+              expect(tok2.next).toBe(undefined)
+              expect(tok2.prev).toBe(undefined)
+              expect(tok2.value).toBe("lel")
+
+              tok3.rm()
+
+              expect(tok3.next).toBe(undefined)
+              expect(tok3.prev).toBe(undefined)
+              expect(tok3.value).toBe("lel2")
+            })
+
+            describe("proper removal before add", () => {
+              test("push", () => {
+                const tok = ls.push("lel")
+                const tok2 = ls.push("lel2")
+                
+                const list2 = new LinkedList()
+
+                list2.push(tok)
+                expect(ls.first).toBe("lel")
+                expect(ls.last).toBe("lel2")
+                list2.pushToken(tok)
+                expect(ls.first).toBe("lel2")
+                expect(ls.last).toBe("lel2")
+
+                list2.pushToken(tok2)
+                expect(ls.first).toBe(undefined)
+                expect(ls.last).toBe(undefined)
+                expect(ls.empty).toBe(true)
+              })
+
+              test("unshift", () => {
+                const tok = ls.push("lel")
+                const tok2 = ls.push("lel2")
+                
+                const list2 = new LinkedList()
+
+                list2.unshift(tok)
+                expect(ls.first).toBe("lel")
+                expect(ls.last).toBe("lel2")
+                list2.unshiftToken(tok)
+                expect(ls.first).toBe("lel2")
+                expect(ls.last).toBe("lel2")
+
+                list2.unshiftToken(tok2)
+                expect(ls.first).toBe(undefined)
+                expect(ls.last).toBe(undefined)
+                expect(ls.empty).toBe(true)
+              })
+
+              describe("bulk", () => {
+                test("push bulk", () => {
+                  const tok1 = ls.push("lel")
+                  const tok2 = ls.push("lel2")
+                  const tok3 = ls.push("lel3")
+
+                  const list2 = new LinkedList()
+
+                  list2.pushTokenBulk([tok1, tok2, tok3])
+                  expect(ls.empty).toBe(true)
+                  expect(list2.empty).toBe(false)
+
+                  ls.pushTokenBulk([tok1, tok2, tok3])
+                  expect(list2.empty).toBe(true)
+                  expect(ls.empty).toBe(false)
+                })
+
+                test("unshift bulk", () => {
+                  const tok1 = ls.push("lel")
+                  const tok2 = ls.push("lel2")
+                  const tok3 = ls.push("lel3")
+
+                  const list2 = new LinkedList()
+
+                  list2.unshiftTokenBulk([tok1, tok2, tok3])
+                  expect(ls.empty).toBe(true)
+                  expect(list2.empty).toBe(false)
+
+                  ls.unshiftTokenBulk([tok1, tok2, tok3])
+                  expect(list2.empty).toBe(true)
+                  expect(ls.empty).toBe(false)
+                })
+              })
+              
+
+            })
+          })
+          
+        })
       })
     })
   })
-  
+})
+})
   
 }

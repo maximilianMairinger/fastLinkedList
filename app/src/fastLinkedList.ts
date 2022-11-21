@@ -1,11 +1,11 @@
 const toStringDefault = e => e.toString()
 
-class End {}
+export class End {}
 
-class Head<T> extends End {
+export class Head<T> extends End {
   public next?: Token<T> | Tail<T>
 }
-class Tail<T> extends End {
+export class Tail<T> extends End {
   public prev?: Token<T> | Head<T>
 }
 
@@ -272,8 +272,8 @@ const forwInv = pushOrUnshift(false, true)
 
 const pr = _LinkedList.prototype as any
 attachPrimitives(pr, forw, revs)
-pr.pushBulkToken = forcePushBulkToPushTokenBulk("pushTokenBulkForce")
-pr.unshiftBulkToken = forcePushBulkToPushTokenBulk("unshiftTokenBulkForce")
+pr.pushTokenBulk = forcePushBulkToPushTokenBulk("pushTokenBulkForce")
+pr.unshiftTokenBulk = forcePushBulkToPushTokenBulk("unshiftTokenBulkForce")
 pr.pushBulk = forcePushBulkToPushBulk("pushTokenBulkForce")
 pr.unshiftBulk = forcePushBulkToPushBulk("unshiftTokenBulkForce")
 pr.pop = function() {return this.popToken().value}
