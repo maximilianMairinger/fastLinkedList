@@ -1,6 +1,6 @@
 {
   "name": "fast-linked-list",
-  "version": "3.1.2",
+  "version": "3.2.0",
   "description": "General purpose, but clean doubly Linked List implementation for the web.",
   "main": "./app/dist/esm/fastLinkedList.js",
   "types": "./app/dist/esm/fastLinkedList.d.ts",
