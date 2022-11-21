@@ -1,6 +1,8 @@
 import _LinkedList, {LengthLinkedList, Token as _Token, LengthToken, End, Head, Tail} from "../../app/src/fastLinkedList"
 import "./extend"
 
+// TODO: insertBefore
+
 
 describe("LinkedList", () => {
   go(_LinkedList, _Token)
@@ -9,16 +11,119 @@ describe("LengthLinkedList", () => {
   go(LengthLinkedList, LengthToken as any)
 
 
-  // describe("Spesific lengt prop test", () => {
-  //   test("Static", () => {
-  //     const l = new LengthLinkedList()
-  //     expect(l.length).toBe(0)
-  //     const ll = new LengthLinkedList("a", "b", "c", "d")
-  //     expect(ll.length).toBe(4)
-  //     const lll = new LengthLinkedList(new LengthLinkedList("a"))
-  //     expect(lll.length).toBe(1)
-  //   })
-  // })
+  describe("Spesific length prop test", () => {
+    test("Static", () => {
+      const l = new LengthLinkedList()
+      expect(l.length).toBe(0)
+      const ll = new LengthLinkedList("a", "b", "c", "d")
+      expect(ll.length).toBe(4)
+      const lll = new LengthLinkedList(new LengthLinkedList("a"))
+      expect(lll.length).toBe(1)
+    })
+
+    describe("mutate", () => {
+      test("push", () => {
+        const l = new LengthLinkedList()
+        l.push("a")
+        expect(l.length).toBe(1)
+        l.push("b")
+        expect(l.length).toBe(2)
+        const tok = l.popToken()
+      })
+      test("unshift", () => {
+        const l = new LengthLinkedList()
+        l.unshift("a")
+        expect(l.length).toBe(1)
+        l.unshift("b")
+        expect(l.length).toBe(2)
+      })
+      test("pop", () => {
+        const l = new LengthLinkedList("a", "b")
+        l.pop()
+        expect(l.length).toBe(1)
+        l.pop()
+        expect(l.length).toBe(0)
+      })
+      test("shift", () => {
+        const l = new LengthLinkedList("a", "b")
+        l.shift()
+        expect(l.length).toBe(1)
+        l.shift()
+        expect(l.length).toBe(0)
+      })
+      test("remove", () => {
+        const l = new LengthLinkedList()
+        const tok1 = l.push("a")
+        const tok2 = l.push("b")
+        expect(l.length).toBe(2)
+        tok1.remove()
+        expect(l.length).toBe(1)
+        tok1.remove()
+        expect(l.length).toBe(1)
+        tok2.remove()
+        expect(l.length).toBe(0)
+      })
+      test("clear", () => {
+        const l = new LengthLinkedList("a", "b")
+        expect(l.length).toBe(2)
+        l.clear()
+        expect(l.length).toBe(0)
+      })
+      test("pushBulk", () => {
+        const l = new LengthLinkedList()
+        l.pushBulk(["a", "b"])
+        expect(l.length).toBe(2)
+        l.pushBulk(["a", "b"])
+        expect(l.length).toBe(4)
+      })
+      test("unshiftBulk", () => {
+        const l = new LengthLinkedList()
+        l.unshiftBulk(["a", "b"])
+        expect(l.length).toBe(2)
+        l.unshiftBulk(["a", "b"])
+        expect(l.length).toBe(4)
+      })
+
+      describe("reverse", () => {
+        test("Static", () => {
+          const l = new LengthLinkedList("a", "b")
+          expect(l.length).toBe(2)
+          l.reverse()
+          expect(l.length).toBe(2)
+        })
+
+        test("Mutate", () => {
+          const l = new LengthLinkedList("a", "b").reverse()
+          expect(l.length).toBe(2)
+
+          const e = l.push("c")
+          expect(l.length).toBe(3)
+          l.unshift("d")
+          expect(l.length).toBe(4)
+          l.push("e")
+          expect(l.length).toBe(5)
+          l.unshiftToken(new LengthToken("f", l) as any)
+          expect(l.length).toBe(6)
+          l.pushToken(e)
+          expect(l.length).toBe(6)
+          e.rm()
+          expect(l.length).toBe(5)
+          e.rm()
+          expect(l.length).toBe(5)
+          l.pop()
+          expect(l.length).toBe(4)
+          l.pop()
+          expect(l.length).toBe(3)
+          l.pop()
+          expect(l.length).toBe(2)
+          l.shift()
+          expect(l.length).toBe(1)
+          l.shift()
+          expect(l.length).toBe(0)
+        })
+      })
+    })
+  })
 })
 
 function go(LinkedList: typeof _LinkedList, Token: typeof _Token) {
@@ -1172,6 +1277,97 @@ function go(LinkedList: typeof _LinkedList, Token: typeof _Token) {
           
         })
       })
+    })
+
+    describe("Reverse", () => {
+      
+      
+      test("Return val", () => {
+        const ls = new LinkedList()
+        const ls2 = ls.reverse()
+        expect(ls2).toBe(ls)
+      })
+
+      describe("Static", () => {
+        let ls: _LinkedList<string>
+        beforeEach(() => {
+          ls = new LinkedList("a", "b", "c")
+          ls.reverse()
+        })
+        test("To Array", () => {
+          expect(ls.toArray()).toEqual(["c", "b", "a"])
+        })
+        test("For Each", () => {
+          const arr: string[] = []
+          ls.forEach((val) => arr.push(val))
+          expect(arr).toEqual(["c", "b", "a"])
+        })
+        test("forof", () => {
+          const arr: string[] = []
+          for (const val of ls) {
+            arr.push(val)
+          }
+          expect(arr).toEqual(["c", "b", "a"])
+        })
+        test("Map", () => {
+          let i = 0
+          const arr = ls.map((val) => val + i++).toArray()
+          expect(arr).toEqual(["c0", "b1", "a2"])
+        })
+
+        test("Double reverse", () => {
+          ls.reverse()
+          expect(ls.toArray()).toEqual(["a", "b", "c"])
+        })
+      })
+
+      describe("Mutate", () => {
+        let ls: _LinkedList<string>
+        beforeEach(() => {
+          ls = new LinkedList("a", "b", "c")
+          ls.reverse()
+        })
+        test("Push", () => {
+          ls.push("d")
+          expect(ls.toArray()).toEqual(["c", "b", "a", "d"])
+        })
+        test("Unshift", () => {
+          ls.unshift("d")
+          expect(ls.toArray()).toEqual(["d", "c", "b", "a"])
+        })
+        test("Pop", () => {
+          expect(ls.pop()).toBe("a")
+          expect(ls.toArray()).toEqual(["c", "b"])
+        })
+        test("Shift", () => {
+          expect(ls.shift()).toBe("c")
+          expect(ls.toArray()).toEqual(["b", "a"])
+        })
+        
+        test("pushBulk", () => {
+          ls.pushBulk(["d", "e"])
+          expect(ls.toArray()).toEqual(["c", "b", "a", "d", "e"])
+        })
+        test("unshiftBulk", () => {
+          ls.unshiftBulk(["d", "e"])
+          expect(ls.toArray()).toEqual(["d", "e", "c", "b", "a"])
+        })
+        test("pushBulk reverse", () => {
+          ls.pushBulk(["d", "e"], true)
+          expect(ls.toArray()).toEqual(["c", "b", "a", "e", "d"])
+        })
+        test("unshiftBulk reverse", () => {
+          ls.unshiftBulk(["d", "e"], true)
+          expect(ls.toArray()).toEqual(["e", "d", "c", "b", "a"])
+        })
+        test("double reverse", () => {
+          ls.unshiftBulk(["d", "e"], true)
+          expect(ls.reverse().toArray()).toEqual(["a", "b", "c", "d", "e"])
+        })
+      })
+      
+
+      
     })
   })
 })

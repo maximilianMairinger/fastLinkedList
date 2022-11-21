@@ -299,7 +299,7 @@ function forcePushBulkToPushTokenBulk(key: string) {
 
 
 
-declare class TypeLinkedList<T> extends _LinkedList<T> {
+declare class __LinkedListType<T> extends _LinkedList<T> {
   protected pushTokenForce(token: Token<T>): Token<T>
   protected pushTokenBulkForce(tokens: Token<T>[], reverse?: boolean): Token<T>
   protected unshiftTokenForce(token: Token<T>): Token<T>
@@ -329,7 +329,7 @@ declare class TypeLinkedList<T> extends _LinkedList<T> {
   lastToken: Token<T>
 }
 
-export type LinkedList<T = unknown> = TypeLinkedList<T>
+export type LinkedList<T = unknown> = __LinkedListType<T>
 
 export const LinkedList = _LinkedList as {
   new<T>(ls: LinkedList<T>): LinkedList<T>
@@ -342,8 +342,8 @@ export default LinkedList
 
 
 
-export class LengthLinkedList<T> extends LinkedList<T> {
-  private _length = 0
+class _LengthLinkedList<T> extends LinkedList<T> {
+  private _length: number // will initially be set in super constructor in clear call
   get length() {return this._length}
 
   constructor(ls: LengthLinkedList<T>, revers?: boolean)
@@ -355,36 +355,78 @@ export class LengthLinkedList<T> extends LinkedList<T> {
     this._length = 0
     return super.clear()
   }
-}
-
-const prL = LengthLinkedList.prototype as any
-for (const funcName of ["unshiftTokenBulkForce", "pushTokenBulkForce"]) {
-  const f = prL[funcName]
-  prL[funcName] = function(...a) {
-    this._length += a[0].length
-    return f.apply(this, a)
+  reverse() {
+    const r = super.reverse()
+    attachLengthProxyToPrimitives(this)
+    return r
   }
 }
 
-for (const funcName of ["unshiftTokenForce", "pushTokenForce"]) {
-  const f = prL[funcName]
-  prL[funcName] = function(...a) {
-    this._length++
-    return f.apply(this, a)
+const prL = _LengthLinkedList.prototype as any
+attachLengthProxyToPrimitives(prL)
+function attachLengthProxyToPrimitives(prL: any) {
+  for (const funcName of ["unshiftTokenBulkForce", "pushTokenBulkForce"]) {
+    const f = prL[funcName]
+    prL[funcName] = function(...a) {
+      this._length += a[0].length
+      return f.apply(this, a)
+    }
+  }
+  
+  for (const funcName of ["unshiftTokenForce", "pushTokenForce"]) {
+    const f = prL[funcName]
+    prL[funcName] = function(...a) {
+      this._length++
+      return f.apply(this, a)
+    }
+  }
+  
+  for (const funcName of ["popToken", "shiftToken"]) {
+    const f = prL[funcName]
+    prL[funcName] = function(...a) {
+      this._length--
+      return f.apply(this, a)
+    }
   }
 }
 
-for (const funcName of ["popToken", "shiftToken"]) {
-  const f = prL[funcName]
-  prL[funcName] = function(...a) {
-    this._length--
-    return f.apply(this, a)
-  }
+declare class __LengthLinkedListType<T = unknown> extends _LengthLinkedList<T> {
+  protected pushTokenForce(token: LengthToken<T>): LengthToken<T>
+  protected pushTokenBulkForce(tokens: LengthToken<T>[], reverse?: boolean): LengthToken<T>
+  protected unshiftTokenForce(token: LengthToken<T>): LengthToken<T>
+  protected unshiftTokenBulkForce(tokens: LengthToken<T>[], reverse?: boolean): LengthToken<T>
+
+  forEach: (cb: (val: T, token: LengthToken<T>) => void) => void
+  pop(): T
+  popToken(): LengthToken<T>
+  shift(): T
+  shiftToken(): LengthToken<T>
+
+  push: (value: T) => LengthToken<T>
+  pushToken: (value: LengthToken<T>) => LengthToken<T>
+  pushBulk: ((values: T[], reverseValues?: boolean) => LengthToken<T>[]) & ((values: LinkedList<T>, reverse?: boolean) => LinkedList<LengthToken<T>>)
+  pushTokenBulk: ((values: LengthToken<T>[], reverseValues?: boolean) => LengthToken<T>[]) & ((values: LinkedList<LengthToken<T>>, reverse?: boolean) => LinkedList<LengthToken<T>>)
+  
+  unshift: (value: T) => LengthToken<T>
+  unshiftToken: (value: LengthToken<T>) => LengthToken<T>
+  unshiftBulk: ((values: T[], reverseValues?: boolean) => LengthToken<T>[]) & ((values: LinkedList<T>, reverse?: boolean) => LinkedList<LengthToken<T>>)
+  unshiftTokenBulk: ((values: LengthToken<T>[], reverseValues?: boolean) => LengthToken<T>[]) & ((values: LinkedList<LengthToken<T>>, reverse?: boolean) => LinkedList<LengthToken<T>>)
+  
+  iterator: () => Iterator<T, T, unknown>
+  [Symbol.iterator]: () => Iterator<T, T, unknown>
+  first: T
+  last: T
+  firstToken: LengthToken<T>
+  lastToken: LengthToken<T>
 }
 
-prL.push = function(val: any) {return this.pushTokenForce(new LengthToken(val, this))}
-prL.unshift = function(val: any) {return this.unshiftTokenForce(new LengthToken(val, this))}
+export type LengthLinkedList<T = unknown> = __LengthLinkedListType<T>
 
+
+export const LengthLinkedList = _LengthLinkedList as {
+  new<T>(ls: LinkedList<T>): LengthLinkedList<T>
+  new<T>(...initValues: T[]): LengthLinkedList<T>
+}
 
 export class LengthToken<T = unknown> extends Token<T> {
   constructor(val: T, protected that: LinkedList<T>) {
@@ -405,8 +447,17 @@ export class LengthToken<T = unknown> extends Token<T> {
     return super._insertTokenBefore(token)
   }
   remove() {
-    (this.that as any)._length--
-    return super.remove()
+    const r = super.remove()
+    if (r) (this.that as any)._length--
+    return r
   }
 }
+
+
+prL.push = function(val: any) {return this.pushTokenForce(new LengthToken(val, this))}
+prL.unshift = function(val: any) {return this.unshiftTokenForce(new LengthToken(val, this))}
+
+const forcePushBulkToPushBulkLength = forcePushBulkToPushBulkWithToken(LengthToken as any)
+prL.pushBulk = forcePushBulkToPushBulkLength("pushTokenBulkForce")
+prL.unshiftBulk = forcePushBulkToPushBulkLength("unshiftTokenBulkForce")
 
