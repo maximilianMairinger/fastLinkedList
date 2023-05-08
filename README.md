@@ -2,7 +2,7 @@
 
 General purpose, but clean doubly Linked List implementation for the web ([3.4kB](https://bundlephobia.com/package/fast-linked-list)), performing decently well in benchmarks.
 
-> Please note that the length of the list is intentionally not being computed. Token#remove() has no way of mutating the length of the list, as it does not have a reference to it's parent list, only it's siblings. If you need this, use a different library.
+> Please note that the length of the list is intentionally (by default) not being computed. `Token#remove()` has no way of mutating the length of the list, as it does not have a reference to it's parent list, only it's siblings. If you need this, use the `LengthLinkedList` export, that functions analog, but provides a length attribute. This is a tradeoff between performance and functionality.
 
 ## Installation
 
