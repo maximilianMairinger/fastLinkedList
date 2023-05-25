@@ -7,7 +7,7 @@
   "exports": {
     "node": {
       "import": "./app/dist/esm/fastLinkedList.mjs",
-      "require": "./app/dist/cjs/fastLinkedList.mjs"
+      "require": "./app/dist/cjs/fastLinkedList.js"
     },
     "default": "./app/dist/esm/fastLinkedList.mjs"
   },
